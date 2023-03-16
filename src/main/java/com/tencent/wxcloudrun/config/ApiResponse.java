@@ -1,5 +1,6 @@
 package com.tencent.wxcloudrun.config;
 
+import com.alibaba.fastjson.JSONObject;
 import lombok.Data;
 
 import java.util.HashMap;
@@ -27,5 +28,8 @@ public final class ApiResponse {
 
   public static ApiResponse error(String errorMsg) {
     return new ApiResponse(0, errorMsg, new HashMap<>());
+  }
+  public static ApiResponse error(int code, String errorMsg,JSONObject jsonObject) {
+    return new ApiResponse(code, errorMsg, jsonObject);
   }
 }

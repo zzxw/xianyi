@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.tencent.wxcloudrun.dao.AddressMapper">
+
+    <resultMap id="AddressMapper" type="com.tencent.wxcloudrun.model.Address">
+        <id property="userID" column="userID"/>
+        <result property="provinceName" column="provinceName"/>
+        <result property="provinceCode" column="provinceCode"/>
+        <result property="cityName" column="cityName"/>
+        <result property="cityCode" column="cityCode"/>
+        <result property="districtName" column="districtName"/>
+        <result property="districtCode" column="districtCode"/>
+        <result property="detail" column="detail"/>
+        <result property="address" column="address"/>
+        <result property="phoneNumber" column="phoneNumber"/>
+        <result property="name" column="name"/>
+        <result property="addressNo" column="addressNo"/>
+        <result property="isDefault" column="isDefault"/>
+<!--        <result property="updatedAt" column="updatedAt" javaType="java.time.LocalDateTime"  />-->
+    </resultMap>
+
+    <select id="queryAddressByUser" resultMap="AddressMapper" parameterType="java.lang.String">
+        SELECT `userID`, `provinceName`,`provinceCode`, `cityName`,`cityCode`,`districtName`,`districtCode`,`address`,`detail`,`phoneNumber`,`name`,`isDefault`,`addressNo`
+        FROM Address
+        WHERE userID = #{userID}
+    </select>
+
+    <select id="queryAddressById" resultMap="AddressMapper">
+        SELECT `userID`, `provinceName`,`provinceCode`, `cityName`,`cityCode`,`districtName`,`districtCode`,`address`,`detail`,`phoneNumber`,`name`,`isDefault`,`addressNo`
+        FROM Address
+        WHERE userID = #{userID} AND addressNo = #{addressNo}
+    </select>
+
+    <delete id="deleteAddress">
+        DELETE
+        FROM Address
+        where userID = #{userID} AND addressNo = #{addressNo}
+    </delete>
+
+    <update id="updateAddress" parameterType="com.tencent.wxcloudrun.model.Address">
+        UPDATE `Address` SET provinceName = #{provinceName},provinceCode = #{provinceCode} ,cityName = #{cityName}, cityCode = #{cityCode},districtName = #{districtName},address = #{address},
+                             districtCode = #{districtCode}, detail = #{detail}, phoneNumber = #{phoneNumber}, name = #{name}, isDefault = #{isDefault} WHERE userID = #{userID} AND addressNo = #{addressNo}
+    </update>
+
+    <update id="updateDefaultAddress" parameterType="java.lang.String">
+        UPDATE `Address` SET isDefault = 0 WHERE userID = #{userID}
+    </update>
+
+    <insert id="createAddress" parameterType="com.tencent.wxcloudrun.model.Address">
+        INSERT INTO `Address`(`userID`, `provinceName`,`provinceCode`,`cityName`,`cityCode`,`districtName`,`districtCode`,`detail`,`address`,`phoneNumber`,`name`,`isDefault`)
+            VALUE(#{userID}, #{provinceName},#{provinceCode},#{cityName},#{cityCode},#{districtName},#{districtCode},#{detail},#{address},#{phoneNumber}, #{name},#{isDefault})
+    </insert>
+
+</mapper>
