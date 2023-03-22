@@ -42,6 +42,8 @@ public interface CounterService {
 
   Address queryAddressById(String userID, int addressNo);
 
+  Address queryDefaultAddress(String userID);
+
   List<Address> queryAddressByUser(String userID);
 
   void deleteAddress(String userID, int addressNo);

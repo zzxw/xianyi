@@ -119,6 +119,11 @@ public class CounterServiceImpl implements CounterService {
   }
 
   @Override
+  public Address queryDefaultAddress(String userID) {
+    return null;
+  }
+
+  @Override
   public List<Address> queryAddressByUser(String userID) {
     return addressMapper.queryAddressByUser(userID);
   }

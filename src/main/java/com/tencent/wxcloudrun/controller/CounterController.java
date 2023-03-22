@@ -268,6 +268,27 @@ public class CounterController {
     return ApiResponse.ok(address);
   }
 
+  @GetMapping(value = "/getDefaultAddress")
+  ApiResponse getDefaultAddress(@RequestParam String userId) {
+    logger.info("/getAddress get request");
+
+    List<Address> list = counterService.queryAddressByUser(userId);
+    Address address = null;
+    if(list.size() == 1) {
+      address = list.get(0);
+    }else  {
+      for(Address address1 : list) {
+        if(address1.getIsDefault() == 1) {
+          address = address1;
+          break;
+        }
+      }
+    }
+    //address = counterService.queryDefaultAddress(userId);
+
+    return ApiResponse.ok(address);
+  }
+
 
   @GetMapping(value = "/deleteAddress")
   ApiResponse deleteAddress(@RequestParam String userId, @RequestParam int addressNo) {

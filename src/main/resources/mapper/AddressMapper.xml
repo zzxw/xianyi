@@ -30,6 +30,12 @@
         FROM Address
         WHERE userID = #{userID} AND addressNo = #{addressNo}
     </select>
+    <select id="queryDefaultAddress" resultType="com.tencent.wxcloudrun.model.Address"
+            parameterType="java.lang.String">
+        SELECT `userID`, `provinceName`,`provinceCode`, `cityName`,`cityCode`,`districtName`,`districtCode`,`address`,`detail`,`phoneNumber`,`name`,`isDefault`,`addressNo`
+        FROM Address
+        WHERE userID = #{userID} AND isDefault = 1
+    </select>
 
     <delete id="deleteAddress">
         DELETE

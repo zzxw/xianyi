@@ -8,7 +8,9 @@ import java.util.List;
 public interface AddressMapper {
     List<Address> queryAddressByUser(@Param("userID") String userID);
 
-    Address  queryAddressById(@Param("userID") String userID, @Param("addressNo") int addressNo);
+    Address queryAddressById(@Param("userID") String userID, @Param("addressNo") int addressNo);
+
+    Address queryDefaultAddress(@Param("userID") String userID);
 
     void deleteAddress(@Param("userID") String userID, @Param("addressNo") int addressNo);
 
