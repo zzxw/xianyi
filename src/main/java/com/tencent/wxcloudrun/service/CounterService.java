@@ -59,4 +59,6 @@ public interface CounterService {
   OrderDetail getOrderDetail(String id);
 
   void newOrderDetail(OrderDetail detail);
+
+  void notify(String notifyData);
 }

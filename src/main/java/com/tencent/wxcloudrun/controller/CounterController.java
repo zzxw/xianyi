@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpRequest;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.w3c.dom.Document;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -302,6 +303,14 @@ public class CounterController {
     //address = counterService.queryDefaultAddress(userId);
 
     return ApiResponse.ok(address);
+  }
+
+  @PostMapping(value = "/payNotify")
+  ApiResponse notify(@RequestBody String notifyData) {
+    logger.info("/payNotify get request");
+
+    counterService.notify(notifyData);
+    return ApiResponse.ok(0);
   }
 
 

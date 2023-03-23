@@ -3,12 +3,14 @@ package com.tencent.wxcloudrun.service.impl;
 import com.tencent.wxcloudrun.dao.*;
 import com.tencent.wxcloudrun.model.*;
 import com.tencent.wxcloudrun.service.CounterService;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class CounterServiceImpl implements CounterService {
@@ -163,5 +165,31 @@ public class CounterServiceImpl implements CounterService {
   @Override
   public void newOrderDetail(OrderDetail detail) {
     orderDetailMapper.newOrderDetail(detail);
+  }
+
+  @Override
+  public void notify(String notifyData) {
+    System.out.println(notifyData);
+    Document document = null;
+    try {
+      document = DocumentHelper.parseText(notifyData);
+      Element root = document.getRootElement();
+      Iterator<Element> iterator = root.elementIterator();
+      Map<String, String> map = new HashMap<>();
+      while(iterator.hasNext()) {
+        Element element = iterator.next();
+        String key = element.getName();
+        String value = element.getText();
+        map.put(key, value);
+      }
+      if("SUCCESS".equals(map.get("result_code"))) {
+        String orderId = map.get("out_trade_no");
+        Order order = queryOrderByID(orderId);
+        order.setStatus(1);
+        updateOrder(order);
+      }
+    } catch (DocumentException e) {
+      e.printStackTrace();
+    }
   }
 }
