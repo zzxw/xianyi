@@ -173,12 +173,12 @@ public class CounterController {
     return ApiResponse.ok(0);
   }
 
+  //使用deleteCart替代该方法
   @GetMapping(value = "/deleteCarts")
   ApiResponse deleteCarts(@RequestParam String userId, @RequestParam String goodsIDs) {
     logger.info("/deleteCarts get request");
 
     //counterService.deleteCarts(userId, goodsIDs);
-
 
     return ApiResponse.ok(0);
   }
@@ -189,7 +189,9 @@ public class CounterController {
     logger.info("/getOrderByUserId get request");
 
     List<Order> list = counterService.queryOrderByUserID(userId);
-
+    for(Order order: list) {
+      order.setList(counterService.getOrderDetails(order.getOrderID()));
+    }
     return ApiResponse.ok(list);
   }
 
@@ -198,6 +200,8 @@ public class CounterController {
     logger.info("/getOrderById get request");
 
     Order order = counterService.queryOrderByID(orderId);
+    List<OrderDetail> list = counterService.getOrderDetails(orderId);
+    order.setList(list);
 
     return ApiResponse.ok(order);
   }
@@ -218,8 +222,19 @@ public class CounterController {
     order.setOrderID(orderID);
 
     counterService.createOrder(order);
-
-    return ApiResponse.ok(0);
+    List<OrderDetail> list = order.getList();
+    int i=0;
+    for(OrderDetail detail:list) {
+      if(i<10){
+        detail.setId(orderID + "0" + i);
+      }else {
+        detail.setId(orderID + i);
+      }
+      i++;
+      detail.setOrderId(orderID);
+      counterService.newOrderDetail(detail);
+    }
+    return ApiResponse.ok(orderID);
   }
 
   @PostMapping(value = "/updateOrder")

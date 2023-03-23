@@ -53,4 +53,10 @@ public interface CounterService {
   void updateDefaultAddress(String userId);
 
   void createAddress(Address address);
+
+  List<OrderDetail> getOrderDetails(String orderId);
+
+  OrderDetail getOrderDetail(String id);
+
+  void newOrderDetail(OrderDetail detail);
 }

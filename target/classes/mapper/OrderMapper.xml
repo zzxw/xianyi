@@ -4,8 +4,8 @@
 
     <resultMap id="OrderMapper" type="com.tencent.wxcloudrun.model.Order">
         <id property="userID" column="userID"/>
-        <result property="goodsID" column="goodsID"/>
-        <result property="num" column="num"/>
+<!--        <result property="goodsID" column="goodsID"/>-->
+<!--        <result property="num" column="num"/>-->
         <result property="createTime" column="createTime"/>
         <result property="price" column="price"/>
         <result property="status" column="status"/>
@@ -15,13 +15,13 @@
     </resultMap>
 
     <select id="queryOrderById" resultMap="OrderMapper" parameterType="java.lang.String">
-        SELECT `userID`, `goodsID`, `num`,`price`,`createTime`,`status`,`orderID`,`addressNo`
+        SELECT `userID`, `price`,`createTime`,`status`,`orderID`,`addressNo`
         FROM `Order`
         WHERE orderID = #{orderID}
     </select>
 
     <select id="queryOrderByUserId" resultMap="OrderMapper" parameterType="java.lang.String">
-        SELECT `userID`, `goodsID`, `num`,`price`,`createTime`,`status`,`orderID`,`addressNo`
+        SELECT `userID`, `price`,`createTime`,`status`,`orderID`,`addressNo`
         FROM `Order`
         WHERE userID = #{userID}
     </select>
@@ -38,8 +38,8 @@
     </update>
 
     <insert id="createOrder" parameterType="com.tencent.wxcloudrun.model.Order">
-        INSERT INTO `Order`(`userID`, `goodsID`,`num`,`price`, `status`,`orderID`,`addressNo`)
-            VALUE(#{userID}, #{goodsID},#{num},#{price}, #{status},#{orderID},#{addressNo})
+        INSERT INTO `Order`(`userID`,`price`, `status`,`orderID`,`addressNo`)
+            VALUE(#{userID},#{price}, #{status},#{orderID},#{addressNo})
     </insert>
 
 </mapper>

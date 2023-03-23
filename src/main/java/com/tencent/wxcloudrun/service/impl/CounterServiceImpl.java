@@ -18,13 +18,15 @@ public class CounterServiceImpl implements CounterService {
   final CartMapper cartMapper;
   final OrderMapper orderMapper;
   final AddressMapper addressMapper;
+  final OrderDetailMapper orderDetailMapper;
 
-  public CounterServiceImpl(@Autowired CountersMapper countersMapper, UserMapper userMapper, CartMapper cartMapper, OrderMapper orderMapper, AddressMapper addressMapper) {
+  public CounterServiceImpl(@Autowired CountersMapper countersMapper, UserMapper userMapper, CartMapper cartMapper, OrderMapper orderMapper, AddressMapper addressMapper, OrderDetailMapper orderDetailMapper) {
     this.countersMapper = countersMapper;
     this.userMapper = userMapper;
     this.cartMapper = cartMapper;
     this.orderMapper = orderMapper;
     this.addressMapper = addressMapper;
+    this.orderDetailMapper = orderDetailMapper;
   }
 
   @Override
@@ -148,5 +150,18 @@ public class CounterServiceImpl implements CounterService {
     addressMapper.createAddress(address);
   }
 
+  @Override
+  public List<OrderDetail> getOrderDetails(String orderId) {
+    return orderDetailMapper.getOrderDetails(orderId);
+  }
 
+  @Override
+  public OrderDetail getOrderDetail(String id) {
+    return orderDetailMapper.getOrderDetail(id);
+  }
+
+  @Override
+  public void newOrderDetail(OrderDetail detail) {
+    orderDetailMapper.newOrderDetail(detail);
+  }
 }

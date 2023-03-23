@@ -1,13 +1,14 @@
 package com.tencent.wxcloudrun.model;
 
 import java.util.Date;
+import java.util.List;
 
 public class Order {
     private String userID;
 
-    private String goodsID;
-
-    private int num;
+//    private String goodsID;
+//
+//    private int num;
 
     private int status;
 
@@ -19,6 +20,8 @@ public class Order {
 
     int addressNo;
 
+    private List<OrderDetail> list;
+
     public String getUserID() {
         return userID;
     }
@@ -27,20 +30,28 @@ public class Order {
         this.userID = userID;
     }
 
-    public String getGoodsID() {
-        return goodsID;
+//    public String getGoodsID() {
+//        return goodsID;
+//    }
+//
+//    public void setGoodsID(String goodsID) {
+//        this.goodsID = goodsID;
+//    }
+//
+//    public int getNum() {
+//        return num;
+//    }
+//
+//    public void setNum(int num) {
+//        this.num = num;
+//    }
+
+    public List<OrderDetail> getList() {
+        return list;
     }
 
-    public void setGoodsID(String goodsID) {
-        this.goodsID = goodsID;
-    }
-
-    public int getNum() {
-        return num;
-    }
-
-    public void setNum(int num) {
-        this.num = num;
+    public void setList(List<OrderDetail> list) {
+        this.list = list;
     }
 
     public int getStatus() {
