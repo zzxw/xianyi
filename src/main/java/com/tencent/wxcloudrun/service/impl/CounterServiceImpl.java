@@ -102,7 +102,7 @@ public class CounterServiceImpl implements CounterService {
   }
 
   @Override
-  public Cart queryCartByID(String userID, String goodsID) {
+  public Cart queryCartByID(String userID, int goodsID) {
     return cartMapper.queryCartByID(userID, goodsID);
   }
 

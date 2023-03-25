@@ -28,7 +28,7 @@ public interface CounterService {
 
   List<Cart> queryCart(String userID);
 
-  Cart queryCartByID(String userID, String goodsID);
+  Cart queryCartByID(String userID, int goodsID);
 
   void createOrder(Order order);
 

@@ -9,7 +9,7 @@ import java.util.Map;
 public interface CartMapper {
     List<Cart> queryCart(@Param("userId") String userId);
 
-    Cart queryCartByID(@Param("userId") String userId, @Param("goodsID") String goodsID);
+    Cart queryCartByID(@Param("userId") String userId, @Param("goodsID") int goodsID);
 
     void createCart(Cart cart);
 

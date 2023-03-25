@@ -17,7 +17,7 @@
         WHERE userId = #{userId}
     </select>
 
-    <select id="queryCartByID" resultMap="CartMapper" parameterType="java.lang.String">
+    <select id="queryCartByID" resultMap="CartMapper">
         SELECT `userId`, `goodsID`, `num`,`time`,`price`
         FROM Cart
         WHERE userId = #{userId} AND goodsID = #{goodsID}

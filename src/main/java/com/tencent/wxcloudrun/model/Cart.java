@@ -5,9 +5,9 @@ import java.util.Date;
 public class Cart {
     private String userId;
 
-    private String goodsID;
+    private int goodsID;
 
-        private int num;
+    private int num;
 
     private Date date;
 
@@ -21,11 +21,11 @@ public class Cart {
         this.userId = userId;
     }
 
-    public String getGoodsID() {
+    public int getGoodsID() {
         return goodsID;
     }
 
-    public void setGoodsID(String goodsID) {
+    public void setGoodsID(int goodsID) {
         this.goodsID = goodsID;
     }
 

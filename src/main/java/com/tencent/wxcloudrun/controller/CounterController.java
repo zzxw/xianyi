@@ -116,8 +116,16 @@ public class CounterController {
     logger.info("/getCart get request");
 
     List<Cart> list = counterService.queryCart(userId);
+    HashMap<String,Object>result = new HashMap<>();
+    for (Cart cart:list
+         ) {
+      int goodsId = cart.getGoodsID();
+      Goods goods = counterService.queryGoodsDetail(goodsId);
 
-    return ApiResponse.ok(list);
+      result.put(String.valueOf(goodsId), goods);
+    }
+    result.put("cartList", list);
+    return ApiResponse.ok(result);
   }
 
   @PostMapping(value = "/newCart")
