@@ -196,6 +196,17 @@ public class CounterController {
     return ApiResponse.ok(list);
   }
 
+  @GetMapping(value = "/getOrderByStatus")
+  ApiResponse getOrderByStatus(@RequestParam String userId, @RequestParam int status) {
+    logger.info("/getOrderByUserId get request");
+
+    List<Order> list = counterService.queryOrderByStatus(userId,status);
+    for(Order order: list) {
+      order.setList(counterService.getOrderDetails(order.getOrderID()));
+    }
+    return ApiResponse.ok(list);
+  }
+
   @GetMapping(value = "/getOrderById")
   ApiResponse getOrderById(@RequestParam String orderId) {
     logger.info("/getOrderById get request");
@@ -423,5 +434,34 @@ public class CounterController {
       return ApiResponse.error("参数action错误");
     }
   }
-  
+
+  @GetMapping(value = "/queryGoodsInfo")
+  ApiResponse queryGoodsDetail(@RequestParam int id) {
+    logger.info("/queryGoodsInfo get request");
+
+    Goods goods = counterService.queryGoodsDetail(id);
+    return ApiResponse.ok(goods);
+  }
+
+  @GetMapping(value = "/queryGoods")
+  ApiResponse queryGoods(@RequestParam int page, @RequestParam int pageSize) {
+    logger.info("/queryGoods get request");
+
+    List<Goods> list = counterService.queryGoods(page, pageSize);
+    return ApiResponse.ok(list);
+  }
+
+  @GetMapping(value = "/deleteGoods")
+  ApiResponse deleteGood(@RequestParam String id) {
+    logger.info("/deleteGoods get request");
+    //Address address = counterService.queryAddressById(userId, addressNo);
+    return ApiResponse.ok(0);
+  }
+
+  @GetMapping(value = "/newGoods")
+  ApiResponse newGoods(@RequestBody Goods goods) {
+    logger.info("/newGoods get request");
+    //Address address = counterService.queryAddressById(userId, addressNo);
+    return ApiResponse.ok(0);
+  }
 }

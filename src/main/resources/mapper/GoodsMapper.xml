@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.tencent.wxcloudrun.dao.GoodsMapper">
+
+    <resultMap id="GoodsMapper" type="com.tencent.wxcloudrun.model.Goods">
+        <id property="id" column="id"/>
+<!--        <result property="goodsID" column="goodsID"/>-->
+<!--        <result property="num" column="num"/>-->
+        <result property="desc" column="desc"/>
+        <result property="price" column="price"/>
+        <result property="title" column="title"/>
+        <result property="path" column="path"/>
+        <result property="descPath" column="descPath"/>
+        <result property="category" column="category"/>
+        <result property="level" column="level"/>
+<!--        <result property="updatedAt" column="updatedAt" javaType="java.time.LocalDateTime"  />-->
+    </resultMap>
+    <select id="queryGoodsDetail" resultType="com.tencent.wxcloudrun.model.Goods">
+        SELECT `id`, `desc`,`title`,`price`,`category`,`path`,`descPath`,`level`
+        FROM `Goods`
+        WHERE id = #{id}
+    </select>
+    <select id="queryGoods" resultType="com.tencent.wxcloudrun.model.Goods">
+        SELECT `id`, `desc`,`title`,`price`,`category`,`path`,`descPath`,`level`
+        FROM `Goods`
+        LIMIT #{pageSize} OFFSET #{startIndex}
+    </select>
+
+
+</mapper>

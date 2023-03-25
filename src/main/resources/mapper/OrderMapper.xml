@@ -25,6 +25,11 @@
         FROM `Order`
         WHERE userID = #{userID}
     </select>
+    <select id="queryOrderByStatus" resultType="com.tencent.wxcloudrun.model.Order">
+        SELECT `userID`, `price`,`createTime`,`status`,`orderID`,`addressNo`
+        FROM `Order`
+        WHERE userID = #{userID} AND status = #{status}
+    </select>
 
     <delete id="deleteOrder" parameterType="java.lang.String">
         DELETE

@@ -7,7 +7,7 @@ public class Cart {
 
     private String goodsID;
 
-    private int num;
+        private int num;
 
     private Date date;
 

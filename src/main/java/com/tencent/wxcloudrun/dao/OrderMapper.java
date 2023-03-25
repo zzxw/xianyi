@@ -10,6 +10,8 @@ public interface OrderMapper {
 
     List<Order> queryOrderByUserId(@Param("userID") String userID);
 
+    List<Order> queryOrderByStatus(@Param("userID") String userID, @Param("userID") int status);
+
     void createOrder(Order order);
 
     void updateOrder(Order order);

@@ -6,7 +6,17 @@ public class Goods {
     private String title;
     private double price;
     private String path;
+    private String descPath;
     private int category;
+    private int level;
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
 
     public String getId() {
         return id;
@@ -54,5 +64,13 @@ public class Goods {
 
     public void setCategory(int category) {
         this.category = category;
+    }
+
+    public String getDescPath() {
+        return descPath;
+    }
+
+    public void setDescPath(String descPath) {
+        this.descPath = descPath;
     }
 }

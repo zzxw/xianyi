@@ -3,7 +3,7 @@ package com.tencent.wxcloudrun.model;
 public class OrderDetail {
     private String id;
     private String orderId;
-    private String goodsId;
+    private int goodsId;
     private int num;
     private double totalPrice;
 
@@ -39,11 +39,11 @@ public class OrderDetail {
         this.orderId = orderId;
     }
 
-    public String getGoodsId() {
+    public int getGoodsId() {
         return goodsId;
     }
 
-    public void setGoodsId(String goodsId) {
+    public void setGoodsId(int goodsId) {
         this.goodsId = goodsId;
     }
 }

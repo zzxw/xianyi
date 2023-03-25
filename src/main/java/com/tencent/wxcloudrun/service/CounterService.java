@@ -40,6 +40,8 @@ public interface CounterService {
 
   List<Order> queryOrderByUserID(String userID);
 
+  List<Order> queryOrderByStatus(String userID, int status);
+
   Order queryOrderByID(String orderID);
 
   Address queryAddressById(String userID, int addressNo);
@@ -55,6 +57,10 @@ public interface CounterService {
   void updateDefaultAddress(String userId);
 
   void createAddress(Address address);
+
+  Goods queryGoodsDetail(int id);
+
+  List<Goods> queryGoods(int page, int pageSize);
 
   List<OrderDetail> getOrderDetails(String orderId);
 

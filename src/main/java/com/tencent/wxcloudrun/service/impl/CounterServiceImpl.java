@@ -33,14 +33,16 @@ public class CounterServiceImpl implements CounterService {
   final OrderMapper orderMapper;
   final AddressMapper addressMapper;
   final OrderDetailMapper orderDetailMapper;
+  final GoodsMapper goodsMapper;
 
-  public CounterServiceImpl(@Autowired CountersMapper countersMapper, UserMapper userMapper, CartMapper cartMapper, OrderMapper orderMapper, AddressMapper addressMapper, OrderDetailMapper orderDetailMapper) {
+  public CounterServiceImpl(@Autowired CountersMapper countersMapper, UserMapper userMapper, CartMapper cartMapper, OrderMapper orderMapper, AddressMapper addressMapper, OrderDetailMapper orderDetailMapper, GoodsMapper goodsMapper) {
     this.countersMapper = countersMapper;
     this.userMapper = userMapper;
     this.cartMapper = cartMapper;
     this.orderMapper = orderMapper;
     this.addressMapper = addressMapper;
     this.orderDetailMapper = orderDetailMapper;
+    this.goodsMapper = goodsMapper;
   }
 
   @Override
@@ -115,8 +117,8 @@ public class CounterServiceImpl implements CounterService {
   }
 
   @Override
-  public void updateOrderStatus(Order ordre) {
-
+  public void updateOrderStatus(Order order) {
+    orderMapper.updateOrderStatus(order);
   }
 
   @Override
@@ -127,6 +129,11 @@ public class CounterServiceImpl implements CounterService {
   @Override
   public List<Order> queryOrderByUserID(String userID) {
     return orderMapper.queryOrderByUserId(userID);
+  }
+
+  @Override
+  public List<Order> queryOrderByStatus(String userID, int status) {
+    return orderMapper.queryOrderByStatus(userID, status);
   }
 
   @Override
@@ -167,6 +174,17 @@ public class CounterServiceImpl implements CounterService {
   @Override
   public void createAddress(Address address) {
     addressMapper.createAddress(address);
+  }
+
+  @Override
+  public Goods queryGoodsDetail(int id) {
+    return goodsMapper.queryGoodsDetail(id);
+  }
+
+  @Override
+  public List<Goods> queryGoods(int page, int pageSize) {
+    int startIndex = (page-1) * pageSize;
+    return goodsMapper.queryGoods(startIndex,pageSize);
   }
 
   @Override
