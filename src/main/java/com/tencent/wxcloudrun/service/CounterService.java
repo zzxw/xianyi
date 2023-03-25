@@ -34,6 +34,8 @@ public interface CounterService {
 
   void updateOrder(Order order);
 
+  void updateOrderStatus(Order order);
+
   void deleteOrder(String orderID);
 
   List<Order> queryOrderByUserID(String userID);
@@ -61,4 +63,6 @@ public interface CounterService {
   void newOrderDetail(OrderDetail detail);
 
   void notify(String notifyData);
+
+  void payOrder(Order order);
 }

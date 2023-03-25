@@ -1,8 +1,18 @@
 package com.tencent.wxcloudrun.service.impl;
 
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.tencent.wxcloudrun.dao.*;
 import com.tencent.wxcloudrun.model.*;
 import com.tencent.wxcloudrun.service.CounterService;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
@@ -10,6 +20,8 @@ import org.dom4j.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.*;
 
 @Service
@@ -103,6 +115,11 @@ public class CounterServiceImpl implements CounterService {
   }
 
   @Override
+  public void updateOrderStatus(Order ordre) {
+
+  }
+
+  @Override
   public void deleteOrder(String orderID) {
     orderMapper.deleteOrder(orderID);
   }
@@ -191,5 +208,68 @@ public class CounterServiceImpl implements CounterService {
     } catch (DocumentException e) {
       e.printStackTrace();
     }
+  }
+
+  @Override
+  public void payOrder(Order order)  {
+    HttpPost httpPost = new HttpPost("https://api.mch.weixin.qq.com/v3/pay/transactions/jsapi");
+    //HttpPost httpPost = new HttpPost("http://api.weixin.qq.com/_/pay/unifiedorder");
+    httpPost.addHeader("Accept", "application/json");
+    httpPost.addHeader("Content-type","application/json; charset=utf-8");
+    CloseableHttpClient httpClient = HttpClients.createDefault();
+    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    ObjectMapper objectMapper = new ObjectMapper();
+
+
+    ObjectNode rootNode = objectMapper.createObjectNode();
+    int newPrice = (int) (order.getPrice() * 100);
+//    rootNode.put("sub_mch_id","1639911327")
+//            .put("appid", "wx7874f23b30f30672")
+//            .put("body", "test")
+//            .put("notify_url", "https://www.weixin.qq.com/wxpay/pay.php")
+//            .put("out_trade_no", order.getOrderID())
+//            .put("openid", "wx7874f23b30f30672")
+//            .put("spbill_create_ip","127.0.0.1")
+//             .put("env_id","prod-6gvg13hsf13d23f3")
+//            .put("total_fee", order.getPrice())
+//            .put("callback_type",2);
+//
+//    rootNode.putObject("container")
+//            .put("service", "springboot-v3w5")
+//            .put("path", "/payNotify");
+    rootNode.put("mchid","1639911327")
+            .put("appid", "wx7874f23b30f30672")
+            .put("description", "test")
+            .put("notify_url", "https://springboot-v3w5-37027-5-1317305634.sh.run.tcloudbase.com/payNotify")
+            .put("out_trade_no", order.getOrderID());
+    rootNode.putObject("amount")
+            .put("total", newPrice);
+    rootNode.putObject("payer")
+            .put("openid", order.getUserID());
+    String bodyAsString = null;
+    CloseableHttpResponse response = null;
+    try {
+      objectMapper.writeValue(bos, rootNode);
+      httpPost.setEntity(new StringEntity(bos.toString("UTF-8"), "UTF-8"));
+      response = httpClient.execute(httpPost);
+
+      bodyAsString = EntityUtils.toString(response.getEntity());
+    } catch (JsonMappingException e) {
+      e.printStackTrace();
+    } catch (JsonGenerationException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }finally {
+      try {
+        httpClient.close();
+        if(response != null) {
+          response.close();
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+    System.out.println(bodyAsString);
   }
 }

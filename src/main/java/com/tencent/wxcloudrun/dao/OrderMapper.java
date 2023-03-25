@@ -14,5 +14,7 @@ public interface OrderMapper {
 
     void updateOrder(Order order);
 
+    void updateOrderStatus(Order order);
+
     void deleteOrder(@Param("orderID") String orderID);
 }

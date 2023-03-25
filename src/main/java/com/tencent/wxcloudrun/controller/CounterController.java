@@ -235,6 +235,7 @@ public class CounterController {
       detail.setOrderId(orderID);
       counterService.newOrderDetail(detail);
     }
+    //counterService.payOrder(order);
     return ApiResponse.ok(orderID);
   }
 
@@ -257,6 +258,27 @@ public class CounterController {
     return ApiResponse.ok(0);
   }
 
+  @PostMapping(value = "/updateOrderStatus")
+    // ApiResponse updateOrder(@RequestParam String userId, @RequestParam String goodsID, @RequestParam int num, @RequestParam double price, @RequestParam int status, @RequestParam String orderID) {
+  ApiResponse updateOrderStatus(@RequestParam String orderId, @RequestParam int status) {
+    logger.info("/updateOrder post request");
+
+//    Order order = new Order();
+//    order.setGoodsID(goodsID);
+//    order.setUserID(userId);
+//    order.setNum(num);
+//    order.setPrice(price);
+//    order.setStatus(status);
+//    order.setOrderID(orderID);
+
+    Order order = new Order();
+    order.setStatus(status);
+    order.setOrderID(orderId);
+    counterService.updateOrderStatus(order);
+    //counterService.updateOrder(order);
+
+    return ApiResponse.ok(0);
+  }
   @GetMapping(value = "/deleteOrder")
   ApiResponse deleteCart(@RequestParam String orderId) {
     logger.info("/deleteCart get request");

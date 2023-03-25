@@ -36,6 +36,9 @@
     <update id="updateOrder" parameterType="com.tencent.wxcloudrun.model.Order">
         UPDATE `Order` SET status = #{status}, addressNo = #{addressNo}  WHERE orderID = #{orderID}
     </update>
+    <update id="updateOrderStatus" parameterType="com.tencent.wxcloudrun.model.Order">
+        UPDATE `Order` SET status = #{status} WHERE orderID = #{orderID}
+    </update>
 
     <insert id="createOrder" parameterType="com.tencent.wxcloudrun.model.Order">
         INSERT INTO `Order`(`userID`,`price`, `status`,`orderID`,`addressNo`)
