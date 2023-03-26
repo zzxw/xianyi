@@ -86,6 +86,7 @@ public class CounterController {
       counterService.createUser(user);
     }
 
+    data.put("phoneNumber",  phoneNumber.substring(0, 3) + "****" + phoneNumber.substring(7));
     return ApiResponse.ok(data);
 //    HttpClient httpClient = new HttpClient();
 //    System.out.println("code is " + code);
