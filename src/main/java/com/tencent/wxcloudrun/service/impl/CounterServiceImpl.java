@@ -207,6 +207,7 @@ public class CounterServiceImpl implements CounterService {
     result.put("pageNum",1);
     result.put("pageSize",10);
     result.put("totalCount",orders.size());
+    List<Map<String, Object>> orderList =  new ArrayList<>();
     for(Order order: orders) {
       Map<String, Object> map = getBasicValue(order);
 
@@ -283,8 +284,9 @@ public class CounterServiceImpl implements CounterService {
       map.put("logisticsVO", logistics);
 
       map.put("paymentVO", getPayInfo(order));
-      result.put("orders", map);
+      orderList.add(map);
     }
+    result.put("orders", orderList);
     return result;
   }
 
