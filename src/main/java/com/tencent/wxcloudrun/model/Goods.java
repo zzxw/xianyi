@@ -10,6 +10,7 @@ public class Goods {
     private int category;
     private int level;
 
+    private final String baseUri = "https://7072-prod-6gvg13hsf13d23f3-1317305634.tcb.qcloud.la/";
     public int getLevel() {
         return level;
     }
@@ -51,7 +52,7 @@ public class Goods {
     }
 
     public String getPath() {
-        return path;
+        return baseUri + path;
     }
 
     public void setPath(String path) {
@@ -67,7 +68,7 @@ public class Goods {
     }
 
     public String getDescPath() {
-        return descPath;
+        return baseUri + descPath;
     }
 
     public void setDescPath(String descPath) {
