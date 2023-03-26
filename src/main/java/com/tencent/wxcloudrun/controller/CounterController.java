@@ -224,6 +224,8 @@ public class CounterController {
     int preCount = counterService.selectCountByStatus(userId, 0);
     int waitCount = counterService.selectCountByStatus(userId, 1);
     int ingCount = counterService.selectCountByStatus(userId, 2);
+    int finshCount = counterService.selectCountByStatus(userId, 3);
+    int tuiCount = counterService.selectCountByStatus(userId, 4);
     Map<String, Integer> preMap = new HashMap<>();
     preMap.put("orderNum",preCount);
     preMap.put("tabType",5);
@@ -239,10 +241,15 @@ public class CounterController {
     ingMap.put("tabType",40);
     list.add(ingMap);
 
-    Map<String, Integer> overMap = new HashMap<>();
-    overMap.put("orderNum",0);
-    overMap.put("tabType", 0);
-    list.add(overMap);
+    Map<String, Integer> finshMap = new HashMap<>();
+    finshMap.put("orderNum",finshCount);
+    finshMap.put("tabType", 60);
+    list.add(finshMap);
+
+    Map<String, Integer> tuiMap = new HashMap<>();
+    tuiMap.put("orderNum",tuiCount);
+    tuiMap.put("tabType", 0);
+    list.add(tuiMap);
     return ApiResponse.ok(list);
   }
 
