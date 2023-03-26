@@ -1,14 +1,23 @@
 package com.tencent.wxcloudrun.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.tencent.wxcloudrun.config.ApiResponse;
 import com.tencent.wxcloudrun.dao.*;
 import com.tencent.wxcloudrun.model.*;
 import com.tencent.wxcloudrun.service.CounterService;
+import com.tencent.wxcloudrun.util.HttpClientSslUtils;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -30,6 +39,9 @@ import java.util.*;
 @Service
 public class CounterServiceImpl implements CounterService {
 
+  final static String APPID = "wx7874f23b30f30672";
+  final String SECRET="7c88c65b513292819127ef927921d708";
+  String token = "";
   final CountersMapper countersMapper;
   final UserMapper userMapper;
   final CartMapper cartMapper;
@@ -500,6 +512,152 @@ public class CounterServiceImpl implements CounterService {
       }
     }
     System.out.println(bodyAsString);
+  }
+
+  @Override
+  public JSONObject getOpenId(String code) {
+    String openId = "";
+    HttpClient httpClient = new HttpClient();
+    System.out.println("code is " + code);
+    PostMethod postMethod = new PostMethod("https://api.weixin.qq.com/sns/jscode2session?appid=" + APPID + "&secret=" + SECRET + "&js_code=" + code + "&grant_type=authorization_code");
+
+    postMethod.addRequestHeader("accept", "*/*");
+    //设置Content-Type，此处根据实际情况确定
+    postMethod.addRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    String result = "";
+    JSONObject data = new JSONObject();
+    try {
+      int status = httpClient.executeMethod(postMethod);
+      if (status == 200){
+        result = postMethod.getResponseBodyAsString();
+        System.out.println("result:" + result);
+        JSONObject json = JSON.parseObject(result);
+        System.out.println(json);
+        Integer errCode = json.getInteger("errcode");
+        if(errCode != null) {
+          String errMsg = json.getString("errmsg");
+        }
+        //data = json.getJSONObject("data");
+        data = json;
+        openId = data.getString("openid");
+        //String sessionKey = data.getString("session_key");
+
+
+      }else{
+        result = postMethod.getResponseBodyAsString();
+        System.out.println("发送请求失败，错误码为:" + status);
+        System.out.println(result);
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return data;
+  }
+
+  @Override
+  public User getUserInfo(String code) {
+    getPhoneNumber(code);
+
+//    HttpClient httpClient = new HttpClient();
+//    PostMethod postMethod = new PostMethod("https://api.weixin.qq.com/wxa/business/getuserphonenumber?access_token=" + getToken());
+//
+//    postMethod.addRequestHeader("accept", "*/*");
+//    //设置Content-Type，此处根据实际情况确定
+//    postMethod.addRequestHeader("Content-Type", "application/json");
+//    String result = "";
+//    JSONObject data = new JSONObject();
+//    HashMap<String, String> map = new HashMap<>();
+//
+//    map.put("code",code);
+//
+//    try {
+//      postMethod.setRequestBody(String.valueOf(new StringRequestEntity(JSON.toJSONString(map), "application/json", "UTF-8")));
+//      //postMethod.setRequestBody(String.valueOf(new StringRequestEntity(JSON.toJSONString(map))));
+//      int status = httpClient.executeMethod(postMethod);
+//      if (status == 200){
+//        result = postMethod.getResponseBodyAsString();
+//        System.out.println("result:" + result);
+//        JSONObject json = JSON.parseObject(result);
+//        System.out.println(json);
+//        Integer errCode = json.getInteger("errcode");
+//        if(errCode != null) {
+//          String errMsg = json.getString("errmsg");
+//        }
+//        //data = json.getJSONObject("data");
+//        data = json.getJSONObject("data");
+//        System.out.println(data);
+//        //String sessionKey = data.getString("session_key");
+//
+//
+//      }else{
+//        result = postMethod.getResponseBodyAsString();
+//        System.out.println("发送请求失败，错误码为:" + status);
+//        System.out.println(result);
+//      }
+//    } catch (IOException e) {
+//      e.printStackTrace();
+//    }
+    return null;
+  }
+
+  public String getToken() {
+    HttpClient httpClient = new HttpClient();
+    GetMethod getMethod = new GetMethod("https://api.weixin.qq.com/cgi-bin/token?appid=" + APPID + "&secret=" + SECRET  + "&grant_type=client_credential");
+
+    getMethod.addRequestHeader("accept", "*/*");
+    //设置Content-Type，此处根据实际情况确定
+    getMethod.addRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    String result = "";
+    JSONObject data = new JSONObject();
+    try {
+      int status = httpClient.executeMethod(getMethod);
+      if (status == 200){
+        result = getMethod.getResponseBodyAsString();
+        System.out.println("result:" + result);
+        JSONObject json = JSON.parseObject(result);
+        System.out.println(json);
+        Integer errCode = json.getInteger("errcode");
+        if(errCode != null) {
+          String errMsg = json.getString("errmsg");
+        }
+        //data = json.getJSONObject("data");
+        data = json;
+        token = data.getString("access_token");
+        //String sessionKey = data.getString("session_key");
+
+
+      }else{
+        result = getMethod.getResponseBodyAsString();
+        System.out.println("发送请求失败，错误码为:" + status);
+        System.out.println(result);
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return token;
+  }
+
+  public JSONObject getPhoneNumber(String code) {
+    JSONObject phone = null;
+    // 获取token
+    //String token_url = String.format("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s", APPID, SECRET);
+    try {
+
+      //获取phone
+      String url = "https://api.weixin.qq.com/wxa/business/getuserphonenumber"
+              + "?access_token=" + getToken();
+      JSONObject jsonObject = new JSONObject();
+      jsonObject.put("code", code);
+      String reqJsonStr = JSON.toJSONString(jsonObject);
+      phone = JSON.parseObject(HttpClientSslUtils.doPost(url, reqJsonStr));
+
+      if (phone == null) {
+        return null;
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return phone;
   }
 }
 

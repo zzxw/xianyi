@@ -1,5 +1,6 @@
 package com.tencent.wxcloudrun.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.tencent.wxcloudrun.model.*;
 
 import java.util.List;
@@ -78,4 +79,9 @@ public interface CounterService {
 
   void payOrder(Order order);
 
+  JSONObject getOpenId(String code);
+
+  User getUserInfo(String openId);
+
+  JSONObject getPhoneNumber(String code);
 }

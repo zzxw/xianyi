@@ -17,6 +17,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.w3c.dom.Document;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -53,59 +54,80 @@ public class CounterController {
     return ApiResponse.ok(count);
   }
 
-  /**
-   * 获取当前计数
-   * @return API response json
-   */
+  @GetMapping(value = "/getUser")
+  ApiResponse createUser(@RequestParam String code) {
+    logger.info("/getUser get request");
+
+    //String openId = request.getHeader("x-wx-openid");
+//    if(!counterService.hasUser(openId)) {
+//      User user = new User();
+//      user.setUserId(openId);
+//      user.setPhoneNumber(phoneNumber);
+//      counterService.createUser(user);
+//    }
+    counterService.getUserInfo(code);
+    return ApiResponse.ok(0);
+  }
+
   @GetMapping(value = "/getUserInfo")
-  ApiResponse getUserInfo(@RequestParam String code) {
+  ApiResponse getUserInfo(@RequestParam String code, @RequestParam String phoneCode) {
     logger.info("/getUserInfo get request");
-    //HttpCli
-    //String userId =
-    HttpClient httpClient = new HttpClient();
-    //code = "093QyB0w3zl3b0320Q1w3HZ5Sg2QyB0j";
-    System.out.println("code is " + code);
-    PostMethod postMethod = new PostMethod("https://api.weixin.qq.com/sns/jscode2session?appid=wx7874f23b30f30672&secret=7c88c65b513292819127ef927921d708&js_code=" + code + "&grant_type=authorization_code");
 
-    postMethod.addRequestHeader("accept", "*/*");
-    //设置Content-Type，此处根据实际情况确定
-    postMethod.addRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-    String result = "";
-    JSONObject data = new JSONObject();
-    try {
-      int status = httpClient.executeMethod(postMethod);
-      if (status == 200){
-        result = postMethod.getResponseBodyAsString();
-        System.out.println("result:" + result);
-        JSONObject json = JSON.parseObject(result);
-        System.out.println(json);
-        Integer errCode = json.getInteger("errcode");
-        if(errCode != null) {
-          String errMsg = json.getString("errmsg");
-          return ApiResponse.error(errCode, errMsg, json);
-        }
-        //data = json.getJSONObject("data");
-        data = json;
-        String openId = data.getString("openid");
-        //String sessionKey = data.getString("session_key");
 
-        if(!counterService.hasUser(openId)) {
-          User user = new User();
-          user.setUserId(openId);
-          counterService.createUser(user);
-        }
+    JSONObject data = counterService.getOpenId(code);
+    JSONObject phoneInfo = counterService.getPhoneNumber(phoneCode);
+    String phoneNumber = phoneInfo.getJSONObject("phone_info").getString("phoneNumber");
 
-      }else{
-        result = postMethod.getResponseBodyAsString();
-        System.out.println("发送请求失败，错误码为:" + status);
-        System.out.println(result);
-      }
-    } catch (IOException e) {
-      e.printStackTrace();
+    String openId = data.getString("openid");
+    if(!counterService.hasUser(openId)) {
+      User user = new User();
+      user.setUserId(openId);
+      user.setPhoneNumber(phoneNumber);
+      counterService.createUser(user);
     }
 
-
     return ApiResponse.ok(data);
+//    HttpClient httpClient = new HttpClient();
+//    System.out.println("code is " + code);
+//    PostMethod postMethod = new PostMethod("https://api.weixin.qq.com/sns/jscode2session?appid=wx7874f23b30f30672&secret=7c88c65b513292819127ef927921d708&js_code=" + code + "&grant_type=authorization_code");
+//
+//    postMethod.addRequestHeader("accept", "*/*");
+//    //设置Content-Type，此处根据实际情况确定
+//    postMethod.addRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+//    String result = "";
+//    JSONObject data = new JSONObject();
+//    try {
+//      int status = httpClient.executeMethod(postMethod);
+//      if (status == 200){
+//        result = postMethod.getResponseBodyAsString();
+//        System.out.println("result:" + result);
+//        JSONObject json = JSON.parseObject(result);
+//        System.out.println(json);
+//        Integer errCode = json.getInteger("errcode");
+//        if(errCode != null) {
+//          String errMsg = json.getString("errmsg");
+//          return ApiResponse.error(errCode, errMsg, json);
+//        }
+//        //data = json.getJSONObject("data");
+//        data = json;
+//        String openId = data.getString("openid");
+//        //String sessionKey = data.getString("session_key");
+//
+//        if(!counterService.hasUser(openId)) {
+//          User user = new User();
+//          user.setUserId(openId);
+//          counterService.createUser(user);
+//        }
+//
+//      }else{
+//        result = postMethod.getResponseBodyAsString();
+//        System.out.println("发送请求失败，错误码为:" + status);
+//        System.out.println(result);
+//      }
+//    } catch (IOException e) {
+//      e.printStackTrace();
+//    }
+
   }
 
   @GetMapping(value = "/getCart")
