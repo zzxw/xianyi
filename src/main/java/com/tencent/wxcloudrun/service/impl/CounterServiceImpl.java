@@ -126,6 +126,12 @@ public class CounterServiceImpl implements CounterService {
   @Override
   public void deleteOrder(String orderID) {
     orderMapper.deleteOrder(orderID);
+    deleteOrderDetailByOrderId(orderID);
+  }
+
+  @Override
+  public void deleteOrderDetailByOrderId(String orderId) {
+    orderDetailMapper.deleteByOrderId(orderId);
   }
 
   @Override

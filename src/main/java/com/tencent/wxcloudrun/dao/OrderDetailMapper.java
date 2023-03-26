@@ -10,4 +10,6 @@ public interface OrderDetailMapper {
     OrderDetail getOrderDetail(String id);
 
     void newOrderDetail(OrderDetail detail);
+
+    void deleteByOrderId(String orderId);
 }

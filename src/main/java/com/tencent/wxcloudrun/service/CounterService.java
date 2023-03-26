@@ -38,6 +38,8 @@ public interface CounterService {
 
   void deleteOrder(String orderID);
 
+  void deleteOrderDetailByOrderId(String orderId);
+
   List<Order> queryOrderByUserID(String userID,int page, int pageSize);
 
   List<Order> queryOrderByStatus(String userID, int status,int page, int pageSize);

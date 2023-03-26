@@ -248,7 +248,7 @@ public class CounterController {
 
     Map<String, Integer> tuiMap = new HashMap<>();
     tuiMap.put("orderNum",tuiCount);
-    tuiMap.put("tabType", 0);
+    tuiMap.put("tabType", 80);
     list.add(tuiMap);
     return ApiResponse.ok(list);
   }
@@ -260,8 +260,10 @@ public class CounterController {
     Order order = counterService.queryOrderByID(orderId);
     List<OrderDetail> list = counterService.getOrderDetails(orderId);
     order.setList(list);
-
-    return ApiResponse.ok(order);
+    List<Order> orderList = new ArrayList<>();
+    orderList.add(order);
+    Map<String, Object> map = counterService.getOrderInfo(orderList);
+    return ApiResponse.ok(map);
   }
 
   @PostMapping(value = "/newOrder")
@@ -337,8 +339,8 @@ public class CounterController {
     return ApiResponse.ok(0);
   }
   @GetMapping(value = "/deleteOrder")
-  ApiResponse deleteCart(@RequestParam String orderId) {
-    logger.info("/deleteCart get request");
+  ApiResponse deleteOrder(@RequestParam String orderId) {
+    logger.info("/deleteOrder get request");
 
     counterService.deleteOrder(orderId);
 

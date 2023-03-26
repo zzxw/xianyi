@@ -12,6 +12,11 @@
         <result property="totalPrice" column="totalPrice"/>
 <!--        <result property="updatedAt" column="updatedAt" javaType="java.time.LocalDateTime"  />-->
     </resultMap>
+    <delete id="deleteByOrderId">
+        DELETE
+        FROM `OrderDetail`
+        where orderID = #{orderID}
+    </delete>
 
 
     <select id="getOrderDetails" resultType="com.tencent.wxcloudrun.model.OrderDetail">
