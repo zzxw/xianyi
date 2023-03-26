@@ -94,7 +94,6 @@ public class CounterServiceImpl implements CounterService {
 
   @Override
   public void deleteCarts(Map<String, String[]> map) {
-    //cartMapper.deleteCarts(userID, goodsIDs);
     cartMapper.deleteCarts(map);
   }
 
