@@ -10,7 +10,7 @@ public interface OrderMapper {
 
     List<Order> queryOrderByUserId(@Param("userID") String userID, @Param("startIndex")int startIndex, @Param("pageSize")int pageSize);
 
-    List<Order> queryOrderByStatus(@Param("userID") String userID, @Param("userID") int status);
+    List<Order> queryOrderByStatus(@Param("userID") String userID, @Param("userID") int status, @Param("startIndex")int startIndex, @Param("pageSize")int pageSize);
 
     void createOrder(Order order);
 

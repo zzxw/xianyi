@@ -30,6 +30,7 @@
         SELECT `userID`, `price`,`createTime`,`status`,`orderID`,`addressNo`
         FROM `Order`
         WHERE userID = #{userID} AND status = #{status}
+        LIMIT #{pageSize} OFFSET #{startIndex}
     </select>
     <select id="selectCountByStatus" resultType="java.lang.Integer">
         SELECT count(1)

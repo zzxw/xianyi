@@ -40,7 +40,7 @@ public interface CounterService {
 
   List<Order> queryOrderByUserID(String userID,int page, int pageSize);
 
-  List<Order> queryOrderByStatus(String userID, int status);
+  List<Order> queryOrderByStatus(String userID, int status,int page, int pageSize);
 
   int selectCountByStatus(String userID, int status);
 

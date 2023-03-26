@@ -204,14 +204,16 @@ public class CounterController {
   }
 
   @GetMapping(value = "/getOrderByStatus")
-  ApiResponse getOrderByStatus(@RequestParam String userId, @RequestParam int status) {
+  ApiResponse getOrderByStatus(@RequestParam String userId, @RequestParam int status, @RequestParam(name = "page", defaultValue = "1") int page,
+                               @RequestParam(name = "pageSize", defaultValue = "10")int pageSize) {
     logger.info("/getOrderByUserId get request");
 
-    List<Order> list = counterService.queryOrderByStatus(userId,status);
+    List<Order> list = counterService.queryOrderByStatus(userId,status,page, pageSize);
     for(Order order: list) {
       order.setList(counterService.getOrderDetails(order.getOrderID()));
     }
-    return ApiResponse.ok(list);
+    Map<String, Object> map = counterService.getOrderInfo(list);
+    return ApiResponse.ok(map);
   }
 
   @GetMapping(value = "/getOrderCount")
