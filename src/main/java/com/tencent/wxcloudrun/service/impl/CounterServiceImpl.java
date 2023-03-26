@@ -22,6 +22,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.*;
 
 @Service
@@ -127,13 +130,19 @@ public class CounterServiceImpl implements CounterService {
   }
 
   @Override
-  public List<Order> queryOrderByUserID(String userID) {
-    return orderMapper.queryOrderByUserId(userID);
+  public List<Order> queryOrderByUserID(String userID, int page,int pageSize) {
+    int startIndex = (page-1) * pageSize;
+    return orderMapper.queryOrderByUserId(userID, startIndex, pageSize);
   }
 
   @Override
   public List<Order> queryOrderByStatus(String userID, int status) {
     return orderMapper.queryOrderByStatus(userID, status);
+  }
+
+  @Override
+  public int selectCountByStatus(String userID, int status) {
+    return orderMapper.selectCountByStatus(userID, status);
   }
 
   @Override
@@ -190,6 +199,200 @@ public class CounterServiceImpl implements CounterService {
   @Override
   public List<OrderDetail> getOrderDetails(String orderId) {
     return orderDetailMapper.getOrderDetails(orderId);
+  }
+
+  @Override
+  public Map<String, Object> getOrderInfo(List<Order> orders) {
+    Map<String, Object> result = new HashMap<>();
+    result.put("pageNum",1);
+    result.put("pageSize",10);
+    result.put("totalCount",orders.size());
+    for(Order order: orders) {
+      Map<String, Object> map = getBasicValue(order);
+
+      map.put("orderId", order.getOrderID() + "1");
+      List<OrderDetail> list = orderDetailMapper.getOrderDetails(order.getOrderID());
+      List<Map<String, Object>> goodsList = new ArrayList<>();
+
+      map.put("orderItemVOs", goodsList);
+      for(OrderDetail detail: list) {
+        Goods goods = goodsMapper.queryGoodsDetail(detail.getGoodsId());
+        Map<String, Object> goodDetail = new HashMap<>();
+
+        int price = (int)(goods.getPrice() * 100);
+        int totalPrice = (int)(detail.getTotalPrice() * 100);
+        goodDetail.put("id", detail.getId());
+        goodDetail.put("orderNo", null);
+        goodDetail.put("spuId", goods.getId());
+        goodDetail.put("skuId", "135696670");
+
+        goodDetail.put("roomId", null);
+        goodDetail.put("goodsMainType", 0);
+        goodDetail.put("goodsViceType", 0);
+        goodDetail.put("goodsName", goods.getTitle());
+
+        goodDetail.put("specifications", new ArrayList<>());
+        goodDetail.put("goodsPictureUrl", goods.getPath());
+        goodDetail.put("originPrice", price);
+        goodDetail.put("actualPrice", price);
+
+        goodDetail.put("buyQuantity", detail.getNum());
+        goodDetail.put("itemTotalAmount", totalPrice);
+        goodDetail.put("itemDiscountAmount", 0);
+        goodDetail.put("goodsPaymentPrice", 0);
+
+        goodDetail.put("tagPrice", null);
+        goodDetail.put("tagText", null);
+        goodDetail.put("outCode", null);
+        goodDetail.put("labelVOs", null);
+        goodDetail.put("buttonVOs", null);
+        goodsList.add(goodDetail);
+
+      }
+      Address address = addressMapper.queryAddressById(order.getUserID(), order.getAddressNo());
+      Map<String, Object> logistics = new HashMap<>();
+      logistics.put("logisticsType", 1);
+      logistics.put("logisticsNo", "");
+      logistics.put("logisticsStatus", null);
+      logistics.put("logisticsCompanyCode", "");
+      logistics.put("receiverAddressId", address.getAddressNo());
+
+      logistics.put("provinceCode", address.getProvinceCode());
+      logistics.put("countryCode", address.getCityCode());
+      logistics.put("receiverProvince", address.getProvinceName());
+      logistics.put("receiverCity", address.getCityName());
+      logistics.put("receiverCountry", address.getDistrictName());
+
+      logistics.put("receiverArea", "");
+      logistics.put("receiverAddress", address.getAddress());
+      logistics.put("receiverPostCode", "");
+      logistics.put("receiverLongitude", "113.829127");
+      logistics.put("receiverLatitude", "22.713649");
+
+      logistics.put("receiverIdentity", "88888888205468");
+      logistics.put("receiverPhone", address.getPhoneNumber());
+      logistics.put("receiverName", address.getName());
+      logistics.put("expectArrivalTime", null);
+      logistics.put("senderName", "");
+
+      logistics.put("senderPhone", "");
+      logistics.put("senderAddress", "");
+      logistics.put("sendTime", null);
+      logistics.put("arrivalTime", null);
+
+      map.put("logisticsVO", logistics);
+
+      map.put("paymentVO", getPayInfo(order));
+      result.put("orders", map);
+    }
+    return result;
+  }
+
+  public Map<String, Object> getPayInfo(Order order) {
+    Map<String, Object> map = new HashMap<>();
+
+    map.put("payStatus", 1);
+    map.put("amount", String.valueOf(order.getPrice() * 100));
+    map.put("currency", null);
+    map.put("payType", null);
+    map.put("payWay", null);
+    map.put("payWayName", null);
+    map.put("interactId", null);
+    map.put("traceNo", null);
+    map.put("channelTrxNo", null);
+    map.put("period", null);
+    map.put("payTime", null);
+    map.put("paySuccessTime", null);
+    return map;
+  }
+
+  public List<Map<String, Object>> getButtonInfo(int status) {
+    List<Map<String, Object>>buttonInfo = new ArrayList<>();
+    Map<String, Object> cancelButton = new HashMap<>();
+    cancelButton.put("primary",false);
+    cancelButton.put("type",2);
+    cancelButton.put("name","取消订单");
+
+    Map<String, Object> againButton = new HashMap<>();
+    againButton.put("primary",true);
+    againButton.put("type",9);
+    againButton.put("name","再次购买");
+
+    Map<String, Object> pagButton = new HashMap<>();
+    pagButton.put("primary",true);
+    pagButton.put("type",1);
+    pagButton.put("name","付款");
+
+    if(status == 5){
+      buttonInfo.add(cancelButton);
+      buttonInfo.add(pagButton);
+    }else if(status == 10) {
+      buttonInfo.add(cancelButton);
+    }
+    return buttonInfo;
+  }
+
+  public Map<String, Object> getBasicValue(Order order) {
+    int totalPrice = (int)(order.getPrice() * 100);
+    int status = order.getStatus();
+    String statusName = "待付款";
+    String remark = "需支付 ￥" + order.getPrice();
+    int orderStatus = 5;
+
+    if(status == 1) {
+      orderStatus= 10;
+      statusName = "待发货";
+      remark = "";
+
+    }else if(status == 2){
+      orderStatus = 40;
+      statusName = "待收货";
+      remark = "";
+    }
+
+    String cancelTime = Long.toString(LocalDateTime.ofInstant(order.getCreateTime().toInstant(), ZoneId.systemDefault()).plusDays(1).toInstant(ZoneOffset.UTC).toEpochMilli());
+    Map<String, Object> map = new HashMap<>();
+    map.put("saasId","8888888");
+    map.put("storeId","1000");
+    map.put("storeName","云Mall深圳旗舰店");
+    map.put("uid","8888888");
+    map.put("parentOrderNo",order.getOrderID());
+    map.put("orderNo",order.getOrderID());
+    map.put("orderType",0);
+    map.put("orderSubType",0);
+    map.put("orderStatus", orderStatus);
+    map.put("orderSubStatus",null);
+    map.put("totalAmount", totalPrice);
+    map.put("goodsAmount", totalPrice);
+
+    map.put("paymentAmount",0);
+    map.put("freightFee",0);
+    map.put("packageFee",0);
+    map.put("discountAmount",0);
+    map.put("channelType", 0);
+    map.put("channelSource","");
+    map.put("channelIdentity", "");
+    map.put("remark", "");
+
+    map.put("cancelType",null);
+    map.put("cancelReasonType",null);
+    map.put("cancelReason", null);
+    map.put("rightsType", null);
+    map.put("createTime", order.getCreateTime().getTime());
+    map.put("labelVOs",null);
+    map.put("invoiceVO", null);
+    map.put("couponAmount", null);
+
+    map.put("autoCancelTime", cancelTime);
+    map.put("orderStatusName", statusName);
+    map.put("orderSatusRemark", remark);
+    map.put("logisticsLogVO", null);
+    map.put("invoiceStatus",null);
+    map.put("invoiceDesc", null);
+    map.put("invoiceUrl", null);
+
+    map.put("buttonVOs", getButtonInfo(orderStatus));
+    return map;
   }
 
   @Override
@@ -291,3 +494,4 @@ public class CounterServiceImpl implements CounterService {
     System.out.println(bodyAsString);
   }
 }
+

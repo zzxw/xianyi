@@ -38,9 +38,11 @@ public interface CounterService {
 
   void deleteOrder(String orderID);
 
-  List<Order> queryOrderByUserID(String userID);
+  List<Order> queryOrderByUserID(String userID,int page, int pageSize);
 
   List<Order> queryOrderByStatus(String userID, int status);
+
+  int selectCountByStatus(String userID, int status);
 
   Order queryOrderByID(String orderID);
 
@@ -64,6 +66,8 @@ public interface CounterService {
 
   List<OrderDetail> getOrderDetails(String orderId);
 
+  Map<String, Object> getOrderInfo(List<Order> orders);
+
   OrderDetail getOrderDetail(String id);
 
   void newOrderDetail(OrderDetail detail);
@@ -71,4 +75,5 @@ public interface CounterService {
   void notify(String notifyData);
 
   void payOrder(Order order);
+
 }

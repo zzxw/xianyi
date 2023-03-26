@@ -8,7 +8,7 @@ import java.util.List;
 public interface OrderMapper {
     Order queryOrderById(@Param("orderID") String orderID);
 
-    List<Order> queryOrderByUserId(@Param("userID") String userID);
+    List<Order> queryOrderByUserId(@Param("userID") String userID, @Param("startIndex")int startIndex, @Param("pageSize")int pageSize);
 
     List<Order> queryOrderByStatus(@Param("userID") String userID, @Param("userID") int status);
 
@@ -19,4 +19,6 @@ public interface OrderMapper {
     void updateOrderStatus(Order order);
 
     void deleteOrder(@Param("orderID") String orderID);
+
+    int selectCountByStatus(@Param("userID") String userID, @Param("status")int status);
 }

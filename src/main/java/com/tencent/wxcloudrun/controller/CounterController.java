@@ -19,10 +19,7 @@ import org.w3c.dom.Document;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.List;
+import java.util.*;
 
 /**
  * counter控制器
@@ -194,14 +191,16 @@ public class CounterController {
 
 
   @GetMapping(value = "/getOrderByUserId")
-  ApiResponse getOrderByUserId(@RequestParam String userId) {
+  ApiResponse getOrderByUserId(@RequestParam String userId, @RequestParam(name = "page", defaultValue = "1") int page,
+                               @RequestParam(name = "pageSize", defaultValue = "10") int pageSize) {
     logger.info("/getOrderByUserId get request");
 
-    List<Order> list = counterService.queryOrderByUserID(userId);
+    List<Order> list = counterService.queryOrderByUserID(userId,page, pageSize);
     for(Order order: list) {
       order.setList(counterService.getOrderDetails(order.getOrderID()));
     }
-    return ApiResponse.ok(list);
+    Map<String, Object> map = counterService.getOrderInfo(list);
+    return ApiResponse.ok(map);
   }
 
   @GetMapping(value = "/getOrderByStatus")
@@ -212,6 +211,36 @@ public class CounterController {
     for(Order order: list) {
       order.setList(counterService.getOrderDetails(order.getOrderID()));
     }
+    return ApiResponse.ok(list);
+  }
+
+  @GetMapping(value = "/getOrderCount")
+  ApiResponse getOrderCount(@RequestParam String userId) {
+    logger.info("/getOrderCount get request");
+
+    List<Map<String, Integer>> list = new ArrayList<>();
+    int preCount = counterService.selectCountByStatus(userId, 0);
+    int waitCount = counterService.selectCountByStatus(userId, 1);
+    int ingCount = counterService.selectCountByStatus(userId, 2);
+    Map<String, Integer> preMap = new HashMap<>();
+    preMap.put("orderNum",preCount);
+    preMap.put("tabType",5);
+    list.add(preMap);
+
+    Map<String, Integer> waitMap = new HashMap<>();
+    waitMap.put("orderNum",waitCount);
+    waitMap.put("tabType",10);
+    list.add(waitMap);
+
+    Map<String, Integer> ingMap = new HashMap<>();
+    ingMap.put("orderNum",ingCount);
+    ingMap.put("tabType",40);
+    list.add(ingMap);
+
+    Map<String, Integer> overMap = new HashMap<>();
+    overMap.put("orderNum",0);
+    overMap.put("tabType", 0);
+    list.add(overMap);
     return ApiResponse.ok(list);
   }
 
