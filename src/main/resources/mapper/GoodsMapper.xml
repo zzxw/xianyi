@@ -13,15 +13,16 @@
         <result property="descPath" column="descPath"/>
         <result property="category" column="category"/>
         <result property="level" column="level"/>
+        <result property="stock" column="stock"/>
 <!--        <result property="updatedAt" column="updatedAt" javaType="java.time.LocalDateTime"  />-->
     </resultMap>
     <select id="queryGoodsDetail" resultType="com.tencent.wxcloudrun.model.Goods">
-        SELECT `id`, `desc`,`title`,`price`,`category`,`path`,`descPath`,`level`
+        SELECT `id`,`stock`, `desc`,`title`,`price`,`category`,`path`,`descPath`,`level`
         FROM `Goods`
         WHERE id = #{id}
     </select>
     <select id="queryGoods" resultType="com.tencent.wxcloudrun.model.Goods">
-        SELECT `id`, `desc`,`title`,`price`,`category`,`path`,`descPath`,`level`
+        SELECT `id`,`stock`, `desc`,`title`,`price`,`category`,`path`,`descPath`,`level`
         FROM `Goods`
         LIMIT #{pageSize} OFFSET #{startIndex}
     </select>

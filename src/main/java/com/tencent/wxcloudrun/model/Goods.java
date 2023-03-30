@@ -9,6 +9,15 @@ public class Goods {
     private String descPath;
     private int category;
     private int level;
+    private int stock;
+
+    public int getStock() {
+        return stock;
+    }
+
+    public void setStock(int stock) {
+        this.stock = stock;
+    }
 
     private final String baseUri = "https://7072-prod-6gvg13hsf13d23f3-1317305634.tcb.qcloud.la/";
     public int getLevel() {

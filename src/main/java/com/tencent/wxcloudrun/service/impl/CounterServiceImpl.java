@@ -1,39 +1,52 @@
 package com.tencent.wxcloudrun.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.tencent.wxcloudrun.config.ApiResponse;
 import com.tencent.wxcloudrun.dao.*;
 import com.tencent.wxcloudrun.model.*;
 import com.tencent.wxcloudrun.service.CounterService;
 import com.tencent.wxcloudrun.util.HttpClientSslUtils;
+import com.wechat.pay.contrib.apache.httpclient.WechatPayHttpClientBuilder;
+import com.wechat.pay.contrib.apache.httpclient.auth.PrivateKeySigner;
+import com.wechat.pay.contrib.apache.httpclient.auth.Verifier;
+import com.wechat.pay.contrib.apache.httpclient.auth.WechatPay2Credentials;
+import com.wechat.pay.contrib.apache.httpclient.auth.WechatPay2Validator;
+import com.wechat.pay.contrib.apache.httpclient.cert.CertificatesManager;
+import com.wechat.pay.contrib.apache.httpclient.exception.HttpCodeException;
+import com.wechat.pay.contrib.apache.httpclient.exception.NotFoundException;
+import com.wechat.pay.contrib.apache.httpclient.util.PemUtil;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.DocumentHelper;
-import org.dom4j.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.*;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -49,8 +62,39 @@ public class CounterServiceImpl implements CounterService {
   final AddressMapper addressMapper;
   final OrderDetailMapper orderDetailMapper;
   final GoodsMapper goodsMapper;
+  final PayMapper payMapper;
 
-  public CounterServiceImpl(@Autowired CountersMapper countersMapper, UserMapper userMapper, CartMapper cartMapper, OrderMapper orderMapper, AddressMapper addressMapper, OrderDetailMapper orderDetailMapper, GoodsMapper goodsMapper) {
+  private static final String MERCHANTSERIALNUMBER ="4884D435779D77A97A92A12D8A0B4D1E6B3EFAD0";
+  private static final String MERCHANTID ="1639911327";
+  private static final String MERCHANTPRIVATEKEY ="MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDeDbOnafXVVMzj\n" +
+          "/71xivDebiOHelu4W4pCMX3vfzuZDoL0Q/5zGeAgR1o0sRgaDCjpgMO5bpWBdPsm\n" +
+          "wOOCtfYmB+K4mgNjSeiE9Q9UebwEy9uq3ZAkNwReJNZH1f+53FhSgvMy+1rQ4ntK\n" +
+          "Ecziv0lA9EzcOzZpTvyF28VPBlGIenSmsVLRKzaSQlJaTH2Qas3nCKWddgDY1Cx2\n" +
+          "2dm/Ad1DuMIomEsqfjCZgIQTvup3N83w/lSKbuHmWJ175ce+KFAfXBQ5EKeNK39O\n" +
+          "i4kgP2115m+Crro3aDXe9PUVwkqBu7AfvRXEQ5tXt5YuFKiURKFX9nO/ah7AzGRe\n" +
+          "XBIB4ig5AgMBAAECggEAG6vrcnZy6zXZHqSVEBw3bhCdntlxqqTFswAF6J2baLR1\n" +
+          "P0ll4SQdWQhrRlu3XC+dvZONUINmYC6aybaJ45UXap/a8hRHTc09C6yaT3WoJ5Tb\n" +
+          "+AwKVWkBw1Wl2mfhqWC7JPUqp3TJWXSP1qgnNy6NS2nmVh+O5Uqxj2DW0sU/zdjx\n" +
+          "S+XkUYG4J9ONtVTPu0fdQXilBfCVL9CHW0yH9n5GY32OcCKkZCTmwEnBHF+tM4a9\n" +
+          "VsVEj/wbaO88abOvlSkXIdrKeIlbVI+6bpweUx9ktp4QjNN7/HAlYxKSAqemkSbZ\n" +
+          "vZUCknTr9CC7xg0zdE+SSrRkKs7mfkNWTAq39lTu8QKBgQD45yPgpHFYuMXB/sNR\n" +
+          "xBrMZIe7ydso1QMqqYV1n2+Kcrub57LfzjaNQ3IGUrv2bsW2N9OBhSBABBoPJjQj\n" +
+          "hMDh8VILAh+ALVUm/4urj6gd2QhwlsBn89sj9Yb12CjaS2MqWd9xzMVYSdHB8kgk\n" +
+          "+XVLUnNPKcPX/IKWLSt27U92lQKBgQDkYpNNBIIlBLirCUzEGpBfgUC7uuq1ZZer\n" +
+          "o2SGolaVFqQBLmZT26DJ0pvA7HaZyFB2hyblSY6YsrxFxYAzUm2Yp6mrUvhuH8PR\n" +
+          "40dN5myfk0BCWXuiKpiEQQLCzJPaEqFHebwok1wVEZM0eLRMo8YiAqt1GvXijK+5\n" +
+          "Vd0h1XI2FQKBgH6ZYmBCg/xyjvOrV0Fhk5fekkNr2nMcVW3/p4g6PguXa+FSqmK3\n" +
+          "inuzkG2y6zPfB+U04/l+8vZcn7yQ2/gs78Z8bhR3UfpqFGOvmyT5/rKfz3Ek3FyD\n" +
+          "ZjUWDz1AYxcVPS0vZT2Gv+G2OmCBkTxtPcHAADKFtb1IDEvCUdc9wSs5AoGAPfFa\n" +
+          "gEYbwkyQhZslHf8Sb0TQONqOdBqU03Gifz2ifBdC7isWh+IGrxaXNfEsjbMd17f6\n" +
+          "Xa/gpBu+IrJZfhH6NbArvZLoXH3zD4c0PLWlenZmtFguxyIEccJsLEduRnRNF+S1\n" +
+          "ms+05uX4Zf/i7vJwd6L/u+hPDl4X/w2Bx35r1q0CgYEAgqKZwPrWHWyGpT9d4B5F\n" +
+          "pj1U9xupk9u8WyeW0qUT533Twmcz52mNXOl7SFCg8MRPYNa/c2hs6gLrIXnOJJHd\n" +
+          "vP7NUJtXqWdz1a0ka8dLjmOuf8mouUOb+U+8tB4Vm/0ETowC3dlQ6XTwqen2ruDK\n" +
+          "vsOva8jS9gHW50EwoZ04Fww=";
+//  private static final String merchantId ="4884D435779D77A97A92A12D8A0B4D1E6B3EFAD0";
+
+  public CounterServiceImpl(@Autowired CountersMapper countersMapper, UserMapper userMapper, CartMapper cartMapper, OrderMapper orderMapper, AddressMapper addressMapper, OrderDetailMapper orderDetailMapper, GoodsMapper goodsMapper, PayMapper payMapper) {
     this.countersMapper = countersMapper;
     this.userMapper = userMapper;
     this.cartMapper = cartMapper;
@@ -58,6 +102,7 @@ public class CounterServiceImpl implements CounterService {
     this.addressMapper = addressMapper;
     this.orderDetailMapper = orderDetailMapper;
     this.goodsMapper = goodsMapper;
+    this.payMapper = payMapper;
   }
 
   @Override
@@ -424,59 +469,99 @@ public class CounterServiceImpl implements CounterService {
 
   @Override
   public void notify(String notifyData) {
-    System.out.println(notifyData);
-    Document document = null;
-    try {
-      document = DocumentHelper.parseText(notifyData);
-      Element root = document.getRootElement();
-      Iterator<Element> iterator = root.elementIterator();
-      Map<String, String> map = new HashMap<>();
-      while(iterator.hasNext()) {
-        Element element = iterator.next();
-        String key = element.getName();
-        String value = element.getText();
-        map.put(key, value);
+    JSONObject result = JSONObject.parseObject(notifyData);
+    String state = result.getString("trade_state");
+    if("SUCCESS".equals(state)) {
+      String orderId = result.getString("out_trade_no");
+      Order order = queryOrderByID(orderId);
+      order.setStatus(1);
+      updateOrder(order);
+      JSONObject amountJson = result.getJSONObject("amount");
+      //double total = Util.getRealFee(amountJson.getInteger("payer_total"), 100);
+      int total = amountJson.getInteger("payer_total");
+      String bank = result.getString("bank_type");
+      JSONArray array = result.getJSONArray("promotion_detail");
+      for(int i=0;i<array.size();i++) {
+        JSONObject promotion = array.getJSONObject(i);
+        //double amount = Util.getRealFee(promotion.getInteger("amount"), 100);
+        int amount = promotion.getInteger("amount");
+        String coupon_id = promotion.getString("coupon_id");
+        String name = promotion.getString("name");
       }
-      if("SUCCESS".equals(map.get("result_code"))) {
-        String orderId = map.get("out_trade_no");
-        Order order = queryOrderByID(orderId);
-        order.setStatus(1);
-        updateOrder(order);
-      }
-    } catch (DocumentException e) {
-      e.printStackTrace();
+      String trade_type = result.getString("trade_type");
+      String transaction_id = result.getString("transaction_id");
+      String success_time = result.getString("success_time");
+      LocalDateTime localDateTime = LocalDateTime.parse(success_time, DateTimeFormatter.ISO_DATE_TIME);
+      JSONObject payerObj = result.getJSONObject("payer");
+      String useId = payerObj.getString("openid");
+      PayResult payResult = new PayResult(bank, total, orderId, trade_type, transaction_id,localDateTime, useId);
+
+      payMapper.createPayResult(payResult);
     }
+
+
+    //如果通知数据是xml类型的使用这个
+//    System.out.println(notifyData);
+//    Document document = null;
+//    try {
+//      document = DocumentHelper.parseText(notifyData);
+//      Element root = document.getRootElement();
+//      Iterator<Element> iterator = root.elementIterator();
+//      Map<String, String> map = new HashMap<>();
+//      while(iterator.hasNext()) {
+//        Element element = iterator.next();
+//        String key = element.getName();
+//        String value = element.getText();
+//        map.put(key, value);
+//      }
+//      if("SUCCESS".equals(map.get("result_code"))) {
+//        String orderId = map.get("out_trade_no");
+//        Order order = queryOrderByID(orderId);
+//        order.setStatus(1);
+//        updateOrder(order);
+//      }
+//    } catch (DocumentException e) {
+//      e.printStackTrace();
+//    }
   }
 
+  public void getCerfification() {
+    try{
+      URIBuilder uriBuilder = new URIBuilder("https://api.mch.weixin.qq.com/v3/certificates");
+      HttpGet httpGet = new HttpGet(uriBuilder.build());
+      httpGet.addHeader("Accept", "application/json");
+      WechatPayHttpClientBuilder builder = getBuild();
+      CloseableHttpClient httpClient = builder.build();
+
+      CloseableHttpResponse response = httpClient.execute(httpGet);
+
+      String bodyAsString = EntityUtils.toString(response.getEntity());
+    }catch (Exception e) {
+      e.printStackTrace();
+    }
+
+  }
+
+
   @Override
-  public void payOrder(Order order)  {
+  public String payOrder(Order order)  {
+    WechatPayHttpClientBuilder builder = getBuild();
+
+
     HttpPost httpPost = new HttpPost("https://api.mch.weixin.qq.com/v3/pay/transactions/jsapi");
     //HttpPost httpPost = new HttpPost("http://api.weixin.qq.com/_/pay/unifiedorder");
     httpPost.addHeader("Accept", "application/json");
     httpPost.addHeader("Content-type","application/json; charset=utf-8");
-    CloseableHttpClient httpClient = HttpClients.createDefault();
+    //CloseableHttpClient httpClient = HttpClients.createDefault();
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    CloseableHttpClient httpClient = builder.build();
     ObjectMapper objectMapper = new ObjectMapper();
 
 
     ObjectNode rootNode = objectMapper.createObjectNode();
     int newPrice = (int) (order.getPrice() * 100);
-//    rootNode.put("sub_mch_id","1639911327")
-//            .put("appid", "wx7874f23b30f30672")
-//            .put("body", "test")
-//            .put("notify_url", "https://www.weixin.qq.com/wxpay/pay.php")
-//            .put("out_trade_no", order.getOrderID())
-//            .put("openid", "wx7874f23b30f30672")
-//            .put("spbill_create_ip","127.0.0.1")
-//             .put("env_id","prod-6gvg13hsf13d23f3")
-//            .put("total_fee", order.getPrice())
-//            .put("callback_type",2);
-//
-//    rootNode.putObject("container")
-//            .put("service", "springboot-v3w5")
-//            .put("path", "/payNotify");
-    rootNode.put("mchid","1639911327")
-            .put("appid", "wx7874f23b30f30672")
+    rootNode.put("mchid",MERCHANTID)
+            .put("appid", APPID)
             .put("description", "test")
             .put("notify_url", "https://springboot-v3w5-37027-5-1317305634.sh.run.tcloudbase.com/payNotify")
             .put("out_trade_no", order.getOrderID());
@@ -509,6 +594,167 @@ public class CounterServiceImpl implements CounterService {
       }
     }
     System.out.println(bodyAsString);
+    JSONObject json = JSON.parseObject(bodyAsString);
+    return json.getString("prepay_id");
+  }
+
+  @Override
+  public void closeOrder(String orderId) {
+    WechatPayHttpClientBuilder builder = getBuild();
+    String url = "https://api.mch.weixin.qq.com/v3/pay/transactions/out-trade-no/" + orderId + "/close";
+    HttpPost httpPost = new HttpPost(url);
+    httpPost.addHeader("Accept", "application/json");
+    httpPost.addHeader("Content-type","application/json; charset=utf-8");
+
+    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    ObjectMapper objectMapper = new ObjectMapper();
+    CloseableHttpClient httpClient = builder.build();
+    CloseableHttpResponse response = null;
+    String bodyAsString = "";
+    try {
+      ObjectNode rootNode = objectMapper.createObjectNode();
+      rootNode.put("mchid",MERCHANTID);
+      //rootNode.put("out_trade_no",orderId);
+      objectMapper.writeValue(bos, rootNode);
+
+      httpPost.setEntity(new StringEntity(bos.toString("UTF-8"), "UTF-8"));
+      response= httpClient.execute(httpPost);
+
+
+//      bodyAsString = EntityUtils.toString(response.getEntity());
+//      System.out.println(bodyAsString);
+    } catch (JsonMappingException e) {
+      e.printStackTrace();
+    } catch (JsonGenerationException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }finally {
+      try {
+        httpClient.close();
+        if(response != null) {
+          response.close();
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+  }
+
+
+
+  @Override
+  public void refundOrder() {
+
+  }
+
+  @Override
+  public String sign(String prepareId, String timeStamp, String nonStr) {
+    String str = APPID + "\n"
+            + timeStamp + "\n"
+            + nonStr + "\n"
+            + prepareId + "\n";
+    String signStr = "";
+    try{
+      Signature sign = Signature.getInstance("SHA256withRSA");
+      //私钥，通过getPrivateKey来获取，这是个方法可以接调用 ，需要的是_key.pem文件的绝对路径配上文件名
+      sign.initSign(getPrivateKey("F:\\download\\WXCertUtil\\cert\\1639911327_20230329_cert\\apiclient_key.pem"));
+      sign.update(str.getBytes("utf-8"));
+      signStr = Base64.getEncoder().encodeToString(sign.sign());
+    } catch (NoSuchAlgorithmException e) {
+      e.printStackTrace();
+    } catch (SignatureException e) {
+      e.printStackTrace();
+    } catch (InvalidKeyException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return signStr;
+  }
+  public  PrivateKey getPrivateKey(String filename) throws IOException {
+
+    String content = new String(Files.readAllBytes(Paths.get(filename)), "utf-8");
+    try {
+      String privateKey = content.replace("-----BEGIN PRIVATE KEY-----", "")
+              .replace("-----END PRIVATE KEY-----", "")
+              .replaceAll("\\s+", "");
+
+      KeyFactory kf = KeyFactory.getInstance("RSA");
+      return kf.generatePrivate(
+              new PKCS8EncodedKeySpec(Base64.getDecoder().decode(privateKey)));
+    } catch (NoSuchAlgorithmException e) {
+      throw new RuntimeException("当前Java环境不支持RSA", e);
+    } catch (InvalidKeySpecException e) {
+      throw new RuntimeException("无效的密钥格式");
+    }
+  }
+
+
+  @Override
+  public String getSign(String prepareId, String timeStamp, String nonStr) {
+
+    String str = APPID + "\n" + timeStamp + "\n" + nonStr + "\n" + prepareId  + "\n";
+    //byte[] privateKeyBytes = Base64.getDecoder().decode(MERCHANTPRIVATEKEY);
+    byte[] privateKeyBytes = "yZwjC7OH9DK3jQzOAf9D3RwHqwfoGmDz".getBytes(StandardCharsets.UTF_8);
+    PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
+    KeyFactory keyFactory = null;
+    PrivateKey privateKey = null;
+    Signature signature = null;
+    byte[] signatureBytes = null;
+    String sign = null;
+    try{
+      keyFactory= KeyFactory.getInstance("RSA");
+      privateKey = keyFactory.generatePrivate(keySpec);
+      signature= Signature.getInstance("SHA256withRSA");
+      signature.initSign(privateKey);
+      signature.update(str.getBytes("UTF-8"));
+      signatureBytes = signature.sign();
+    } catch (NoSuchAlgorithmException e) {
+      e.printStackTrace();
+    } catch (InvalidKeySpecException e) {
+      e.printStackTrace();
+    } catch (InvalidKeyException e) {
+      e.printStackTrace();
+    } catch (UnsupportedEncodingException e) {
+      e.printStackTrace();
+    } catch (SignatureException e) {
+      e.printStackTrace();
+    }
+    if(signatureBytes != null) {
+      sign = Base64.getEncoder().encodeToString(signatureBytes);
+    }
+    return sign;
+  }
+
+  public WechatPayHttpClientBuilder getBuild() {
+    PrivateKey merchantPrivateKey = null;
+    CertificatesManager certificatesManager = null;
+    Verifier verifier = null;
+    try{
+      merchantPrivateKey = PemUtil.loadPrivateKey(
+              new ByteArrayInputStream(MERCHANTPRIVATEKEY.getBytes("utf-8")));
+      certificatesManager = CertificatesManager.getInstance();
+// 向证书管理器增加需要自动更新平台证书的商户信息
+      certificatesManager.putMerchant(MERCHANTID, new WechatPay2Credentials(MERCHANTID,
+              new PrivateKeySigner(MERCHANTSERIALNUMBER, merchantPrivateKey)), "yZwjC7OH9DK3jQzOAf9D3RwHqwfoGmDz".getBytes(StandardCharsets.UTF_8));
+      verifier = certificatesManager.getVerifier(MERCHANTID);
+    } catch (GeneralSecurityException e) {
+      e.printStackTrace();
+    } catch (UnsupportedEncodingException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    } catch (HttpCodeException e) {
+      e.printStackTrace();
+    } catch (NotFoundException e) {
+      e.printStackTrace();
+    }
+
+    WechatPayHttpClientBuilder builder = WechatPayHttpClientBuilder.create()
+            .withMerchant(MERCHANTID, MERCHANTSERIALNUMBER, merchantPrivateKey)
+            .withValidator(new WechatPay2Validator(verifier));
+    return builder;
   }
 
   @Override

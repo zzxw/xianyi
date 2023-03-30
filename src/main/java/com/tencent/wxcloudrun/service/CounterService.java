@@ -79,11 +79,20 @@ public interface CounterService {
 
   void notify(String notifyData);
 
-  void payOrder(Order order);
+  String payOrder(Order order);
 
   JSONObject getOpenId(String code);
 
   User getUserInfo(String openId);
 
   JSONObject getPhoneNumber(String code);
+
+  void closeOrder(String orderId);
+
+  void refundOrder();
+
+  String sign(String prepareId, String timeStamp, String nonStr);
+
+  String getSign(String prepareId, String timeStamp, String nonStr);
+
 }

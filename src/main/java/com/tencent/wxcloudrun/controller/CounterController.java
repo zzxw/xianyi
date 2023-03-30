@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.tencent.wxcloudrun.model.*;
 import com.tencent.wxcloudrun.util.OrderUtil;
+import com.tencent.wxcloudrun.util.Util;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.slf4j.Logger;
@@ -337,8 +338,36 @@ public class CounterController {
       detail.setOrderId(orderID);
       counterService.newOrderDetail(detail);
     }
-    //counterService.payOrder(order);
-    return ApiResponse.ok(orderID);
+    String prepay_id = counterService.payOrder(order);
+    String nonStr = Util.generateRandomString(32);
+    String timeStamp = Util.getTimeStamp();
+    //String sign = counterService.getSign(prepay_id, timeStamp, nonStr);
+    String sign = counterService.sign(prepay_id, timeStamp, nonStr);
+    Map<String, String> map = new HashMap<>();
+    map.put("appId", "wx7874f23b30f30672");
+    map.put("nonceStr",nonStr);
+    map.put("package",prepay_id);
+    map.put("paySign",sign);
+    map.put("signType","RSA");
+    map.put("timeStamp",timeStamp);
+    return ApiResponse.ok(map);
+  }
+
+  @GetMapping(value = "/closeOrderPay")
+    //ApiResponse newOrder(@RequestParam String userId, @RequestParam String goodsID, @RequestParam int num, @RequestParam double price, @RequestParam int status) {
+  ApiResponse closeOrder(@RequestParam String orderId) {
+    logger.info("/closeOrderPay post request");
+
+    counterService.closeOrder(orderId);
+//    Order order = new Order();
+//    order.setGoodsID(goodsID);
+//    order.setUserID(userId);
+//    order.setNum(num);
+//    order.setPrice(price);
+//    order.setStatus(status);
+
+
+    return ApiResponse.ok(0);
   }
 
   @PostMapping(value = "/updateOrder")
@@ -423,7 +452,7 @@ public class CounterController {
           break;
         }
       }
-      if(address == null) {
+      if(address == null && list.size() > 0) {
         address = list.get(0);
       }
     }
@@ -435,8 +464,10 @@ public class CounterController {
   @PostMapping(value = "/payNotify")
   ApiResponse notify(@RequestBody String notifyData) {
     logger.info("/payNotify get request");
-
-    counterService.notify(notifyData);
+    logger.info("回调通知数据为:");
+    logger.info(notifyData);
+    String decodeData = Util.decode(notifyData);
+    counterService.notify(decodeData);
     return ApiResponse.ok(0);
   }
 
