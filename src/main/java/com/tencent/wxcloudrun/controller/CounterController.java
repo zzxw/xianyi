@@ -69,6 +69,26 @@ public class CounterController {
     return ApiResponse.ok(0);
   }
 
+  @GetMapping(value = "/getUser")
+  ApiResponse getUser(@RequestParam String code) {
+    logger.info("/getUser get request");
+
+
+    JSONObject data = counterService.getOpenId(code);
+
+    String openId = data.getString("openid");
+    User user = counterService.getUser(openId);
+    if(user != null) {
+      String phoneNumber = user.getPhoneNumber();
+      data.put("phoneNumber",  phoneNumber.substring(0, 3) + "****" + phoneNumber.substring(7));
+//      User user = new User();
+//      user.setUserId(openId);
+//      counterService.createUser(user);
+    }
+    return ApiResponse.ok(data);
+
+  }
+
   @GetMapping(value = "/getUserInfo")
   ApiResponse getUserInfo(@RequestParam String code, @RequestParam String phoneCode) {
     logger.info("/getUserInfo get request");
@@ -79,12 +99,12 @@ public class CounterController {
     String phoneNumber = phoneInfo.getJSONObject("phone_info").getString("phoneNumber");
 
     String openId = data.getString("openid");
-    if(!counterService.hasUser(openId)) {
-      User user = new User();
-      user.setUserId(openId);
-      user.setPhoneNumber(phoneNumber);
-      counterService.createUser(user);
-    }
+    //if(!counterService.hasUser(openId)) {
+    User user = new User();
+    user.setUserId(openId);
+    user.setPhoneNumber(phoneNumber);
+    counterService.createUser(user);
+    //}
 
     data.put("phoneNumber",  phoneNumber.substring(0, 3) + "****" + phoneNumber.substring(7));
     return ApiResponse.ok(data);
@@ -402,6 +422,9 @@ public class CounterController {
           address = address1;
           break;
         }
+      }
+      if(address == null) {
+        address = list.get(0);
       }
     }
     //address = counterService.queryDefaultAddress(userId);

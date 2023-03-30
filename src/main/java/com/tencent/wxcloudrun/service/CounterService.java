@@ -15,7 +15,7 @@ public interface CounterService {
 
   void clearCount(Integer id);
 
-  boolean hasUser(String userID);
+  User getUser(String userID);
 
   void createUser(User userInfo);
 
@@ -54,6 +54,8 @@ public interface CounterService {
   Address queryDefaultAddress(String userID);
 
   List<Address> queryAddressByUser(String userID);
+
+  //void deleteAddress(String userID, int addressNo);
 
   void deleteAddress(String userID, int addressNo);
 

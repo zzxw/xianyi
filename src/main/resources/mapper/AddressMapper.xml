@@ -16,13 +16,14 @@
         <result property="name" column="name"/>
         <result property="addressNo" column="addressNo"/>
         <result property="isDefault" column="isDefault"/>
+        <result property="isValid" column="isValid"/>
 <!--        <result property="updatedAt" column="updatedAt" javaType="java.time.LocalDateTime"  />-->
     </resultMap>
 
     <select id="queryAddressByUser" resultMap="AddressMapper" parameterType="java.lang.String">
         SELECT `userID`, `provinceName`,`provinceCode`, `cityName`,`cityCode`,`districtName`,`districtCode`,`address`,`detail`,`phoneNumber`,`name`,`isDefault`,`addressNo`
         FROM Address
-        WHERE userID = #{userID}
+        WHERE userID = #{userID} AND isValid = 0
     </select>
 
     <select id="queryAddressById" resultMap="AddressMapper">
@@ -34,12 +35,17 @@
             parameterType="java.lang.String">
         SELECT `userID`, `provinceName`,`provinceCode`, `cityName`,`cityCode`,`districtName`,`districtCode`,`address`,`detail`,`phoneNumber`,`name`,`isDefault`,`addressNo`
         FROM Address
-        WHERE userID = #{userID} AND isDefault = 1
+        WHERE userID = #{userID} AND isDefault = 1 AND isValid = 0
     </select>
 
+<!--    <delete id="deleteAddress">-->
+<!--        DELETE-->
+<!--        FROM Address-->
+<!--        where userID = #{userID} AND addressNo = #{addressNo}-->
+<!--    </delete>-->
+
     <delete id="deleteAddress">
-        DELETE
-        FROM Address
+        UPDATE `Address` SET isValid = 1
         where userID = #{userID} AND addressNo = #{addressNo}
     </delete>
 

@@ -27,6 +27,16 @@ public class Address {
 
     private String address;
 
+    private int isValid;
+
+    public int getIsValid() {
+        return isValid;
+    }
+
+    public void setIsValid(int isValid) {
+        this.isValid = isValid;
+    }
+
     public String getUserID() {
         return userID;
     }

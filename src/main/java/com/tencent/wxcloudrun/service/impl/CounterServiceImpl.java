@@ -76,12 +76,9 @@ public class CounterServiceImpl implements CounterService {
   }
 
   @Override
-  public boolean hasUser(String userId) {
+  public User getUser(String userId) {
     User user = userMapper.getUser(userId);
-    if(user != null) {
-      return true;
-    }
-    return user == null ? false : true;
+    return user;
   }
 
   @Override
