@@ -54,7 +54,7 @@ public class CounterController {
     return ApiResponse.ok(count);
   }
 
-  @GetMapping(value = "/getUser")
+  @GetMapping(value = "/getUserByCode")
   ApiResponse createUser(@RequestParam String code) {
     logger.info("/getUser get request");
 
