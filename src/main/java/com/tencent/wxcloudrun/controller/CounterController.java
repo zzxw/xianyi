@@ -243,7 +243,7 @@ public class CounterController {
     for(Order order: list) {
       order.setList(counterService.getOrderDetails(order.getOrderID()));
     }
-    Map<String, Object> map = counterService.getOrderInfo(list);
+    Map<String, Object> map = counterService.getOrderInfo(list, page, pageSize);
     return ApiResponse.ok(map);
   }
 
@@ -256,7 +256,7 @@ public class CounterController {
     for(Order order: list) {
       order.setList(counterService.getOrderDetails(order.getOrderID()));
     }
-    Map<String, Object> map = counterService.getOrderInfo(list);
+    Map<String, Object> map = counterService.getOrderInfo(list, page, pageSize);
     return ApiResponse.ok(map);
   }
 
@@ -306,7 +306,7 @@ public class CounterController {
     order.setList(list);
     List<Order> orderList = new ArrayList<>();
     orderList.add(order);
-    Map<String, Object> map = counterService.getOrderInfo(orderList);
+    Map<String, Object> map = counterService.getOrderInfo(orderList, 1, 10);
     return ApiResponse.ok(map);
   }
 

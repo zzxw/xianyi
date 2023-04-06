@@ -71,7 +71,7 @@ public interface CounterService {
 
   List<OrderDetail> getOrderDetails(String orderId);
 
-  Map<String, Object> getOrderInfo(List<Order> orders);
+  Map<String, Object> getOrderInfo(List<Order> orders,int page, int pageSize);
 
   OrderDetail getOrderDetail(String id);
 

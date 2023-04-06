@@ -262,10 +262,10 @@ public class CounterServiceImpl implements CounterService {
   }
 
   @Override
-  public Map<String, Object> getOrderInfo(List<Order> orders) {
+  public Map<String, Object> getOrderInfo(List<Order> orders,int page, int pageSize) {
     Map<String, Object> result = new HashMap<>();
-    result.put("pageNum",1);
-    result.put("pageSize",10);
+    result.put("pageNum",page);
+    result.put("pageSize", pageSize);
     result.put("totalCount",orders.size());
     List<Map<String, Object>> orderList =  new ArrayList<>();
     for(Order order: orders) {
