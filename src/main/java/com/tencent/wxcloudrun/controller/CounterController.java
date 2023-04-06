@@ -415,7 +415,11 @@ public class CounterController {
   ApiResponse deleteOrder(@RequestParam String orderId) {
     logger.info("/deleteOrder get request");
 
-    counterService.deleteOrder(orderId);
+    //counterService.deleteOrder(orderId);
+    Order order = new Order();
+    order.setOrderID(orderId);
+    order.setStatus(-1);
+    counterService.updateOrderStatus(order);
 
     return ApiResponse.ok(0);
   }

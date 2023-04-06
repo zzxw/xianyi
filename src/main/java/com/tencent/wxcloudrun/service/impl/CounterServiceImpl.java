@@ -293,7 +293,9 @@ public class CounterServiceImpl implements CounterService {
         goodDetail.put("goodsName", goods.getTitle());
 
         goodDetail.put("specifications", new ArrayList<>());
-        goodDetail.put("goodsPictureUrl", goods.getPath());
+        String path = goods.getPath().split(",")[0];
+
+        goodDetail.put("goodsPictureUrl", path);
         goodDetail.put("originPrice", price);
         goodDetail.put("actualPrice", price);
 
