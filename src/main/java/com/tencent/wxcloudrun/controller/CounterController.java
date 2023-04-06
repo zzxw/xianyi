@@ -350,6 +350,7 @@ public class CounterController {
     map.put("paySign",sign);
     map.put("signType","RSA");
     map.put("timeStamp",timeStamp);
+    map.put("orderId", orderID);
     return ApiResponse.ok(map);
   }
 

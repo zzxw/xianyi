@@ -10,7 +10,15 @@ public class Goods {
     private int category;
     private int level;
     private int stock;
+    private String specList;
 
+    public String getSpecList() {
+        return specList;
+    }
+
+    public void setSpecList(String specList) {
+        this.specList = specList;
+    }
     public int getStock() {
         return stock;
     }
