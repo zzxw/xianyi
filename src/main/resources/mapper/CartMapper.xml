@@ -12,21 +12,21 @@
     </resultMap>
 
     <select id="queryCart" resultMap="CartMapper" parameterType="java.lang.String">
-        SELECT `userId`, `goodsID`, `num`,`time`,`price`
+        SELECT `userId`, `goodsID`, `num`,`time`,`price`,`specId`
         FROM Cart
         WHERE userId = #{userId}
     </select>
 
     <select id="queryCartByID" resultMap="CartMapper">
-        SELECT `userId`, `goodsID`, `num`,`time`,`price`
+        SELECT `userId`, `goodsID`, `num`,`time`,`price`,`specId`
         FROM Cart
-        WHERE userId = #{userId} AND goodsID = #{goodsID}
+        WHERE userId = #{userId} AND goodsID = #{goodsID} AND specId = #{specId}
     </select>
 
-    <delete id="deleteCart" parameterType="java.lang.String">
+    <delete id="deleteCart">
         DELETE
         FROM Cart
-        where userId = #{userId} AND goodsID = #{goodsID}
+        where userId = #{userId} AND goodsID = #{goodsID} AND specId = #{specId}
     </delete>
 
     <delete id="deleteCarts" parameterType="java.util.Map">
@@ -41,15 +41,18 @@
         <foreach collection="info.goodsID" item="goodsID" index="index" open="(" close=")" separator=",">
               #{goodsID}
         </foreach>
+        <foreach collection="info.specId" item="specId" index="index" open="(" close=")" separator=",">
+            #{specId}
+        </foreach>
     </delete>
 
     <update id="updateCart" parameterType="com.tencent.wxcloudrun.model.Cart">
-        UPDATE `Cart` SET num = #{num} ,price = #{price} WHERE userId = #{userId} AND goodsID = #{goodsID}
+        UPDATE `Cart` SET num = #{num} ,price = #{price} WHERE userId = #{userId} AND goodsID = #{goodsID} AND specId = #{specId}
     </update>
 
     <insert id="createCart" parameterType="com.tencent.wxcloudrun.model.Cart">
-        INSERT INTO `Cart`(`userId`, `goodsID`,`num`,`price`)
-            VALUE(#{userId}, #{goodsID},#{num},#{price})
+        INSERT INTO `Cart`(`userId`, `goodsID`,`num`,`price`,`specId`)
+            VALUE(#{userId}, #{goodsID},#{num},#{price},#{specId})
     </insert>
 
 </mapper>

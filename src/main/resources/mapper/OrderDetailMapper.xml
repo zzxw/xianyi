@@ -10,6 +10,7 @@
         <result property="goodsId" column="goodsId"/>
         <result property="num" column="num"/>
         <result property="totalPrice" column="totalPrice"/>
+        <result property="specId" column="specId"/>
 <!--        <result property="updatedAt" column="updatedAt" javaType="java.time.LocalDateTime"  />-->
     </resultMap>
     <delete id="deleteByOrderId">
@@ -20,19 +21,19 @@
 
 
     <select id="getOrderDetails" resultType="com.tencent.wxcloudrun.model.OrderDetail">
-        SELECT `id`, `orderId`,`goodsId`,`num`,`totalPrice`
+        SELECT `id`, `orderId`,`goodsId`,`num`,`totalPrice`,`specId`
         FROM `OrderDetail`
         WHERE orderId = #{orderId}
     </select>
     <select id="getOrderDetail" resultType="com.tencent.wxcloudrun.model.OrderDetail">
-        SELECT `id`, `orderId`,`goodsId`,`num`,`totalPrice`
+        SELECT `id`, `orderId`,`goodsId`,`num`,`totalPrice`,`specId`
         FROM `OrderDetail`
         WHERE id = #{id}
     </select>
 
 
     <insert id="newOrderDetail" parameterType="com.tencent.wxcloudrun.model.OrderDetail">
-        INSERT INTO `OrderDetail`(`id`,`orderId`, `goodsId`,`num`,`totalPrice`)
-            VALUE(#{id},#{orderId}, #{goodsId},#{num},#{totalPrice})
+        INSERT INTO `OrderDetail`(`id`,`orderId`, `goodsId`,`num`,`totalPrice`,`specId`)
+            VALUE(#{id},#{orderId}, #{goodsId},#{num},#{totalPrice},#{totalPrice})
     </insert>
 </mapper>

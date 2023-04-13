@@ -1,6 +1,7 @@
 package com.tencent.wxcloudrun.model;
 
 import java.util.Date;
+import java.util.List;
 
 public class Cart {
     private String userId;
@@ -12,6 +13,26 @@ public class Cart {
     private Date date;
 
     private double price;
+
+    private int specId;
+
+    private List<Spec> specList;
+
+    public List<Spec> getSpecList() {
+        return specList;
+    }
+
+    public void setSpecList(List<Spec> specList) {
+        this.specList = specList;
+    }
+
+    public int getSpecId() {
+        return specId;
+    }
+
+    public void setSpecId(int specId) {
+        this.specId = specId;
+    }
 
     public String getUserId() {
         return userId;

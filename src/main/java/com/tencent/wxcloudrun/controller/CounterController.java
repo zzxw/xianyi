@@ -173,20 +173,32 @@ public class CounterController {
   //ApiResponse newCart(@RequestParam String userId, @RequestParam String goodsID, @RequestParam int num, @RequestParam double price) {
   ApiResponse newCart(@RequestBody Cart cart) {
     logger.info("/newCart post request");
-    Cart oldCart = counterService.queryCartByID(cart.getUserId(), cart.getGoodsID());
+
 //    Cart cart = new Cart();
 //    cart.setUserId(userId);
 //    cart.setGoodsID(goodsID);
 //    cart.setPrice(price);
 //    cart.setNum(num);
 //    counterService.createCart(cart);
-    if(oldCart != null) {
-      cart.setNum(cart.getNum() + oldCart.getNum());
-      counterService.updateCart(cart);
-    }else{
-      //cart.setNum(num);
-      counterService.createCart(cart);
+    List<Spec> list = cart.getSpecList();
+    for (Spec spec: list
+    ) {
+      Cart item = new Cart();
+      item.setSpecId(spec.getSpecId());
+      item.setPrice(spec.getPrice());
+      item.setNum(spec.getBuyNum());
+      item.setUserId(cart.getUserId());
+      item.setGoodsID(cart.getGoodsID());
+      Cart oldCart = counterService.queryCartByID(cart.getUserId(), item.getGoodsID(), item.getSpecId());
+      if(oldCart != null) {
+        item.setNum(cart.getNum() + oldCart.getNum());
+        counterService.updateCart(item);
+      }else{
+        //cart.setNum(num);
+        counterService.createCart(item);
+      }
     }
+
     return ApiResponse.ok(0);
   }
 
@@ -200,23 +212,36 @@ public class CounterController {
 //    cart.setPrice(price);
 //    cart.setNum(num);
 
-    counterService.updateCart(cart);
+    List<Spec> list = cart.getSpecList();
+    for (Spec spec: list
+         ) {
+      Cart item = new Cart();
+      item.setSpecId(spec.getSpecId());
+      item.setPrice(spec.getPrice());
+      item.setNum(spec.getBuyNum());
+      item.setUserId(cart.getUserId());
+      item.setGoodsID(cart.getGoodsID());
+      counterService.updateCart(item);
+    }
+    //counterService.updateCart(cart);
 
     return ApiResponse.ok(0);
   }
 
   @GetMapping(value = "/deleteCart")
-  ApiResponse deleteCart(@RequestParam String userId, @RequestParam String goodsID) {
+  ApiResponse deleteCart(@RequestParam String userId, @RequestParam String goodsID, @RequestParam String specId) {
     logger.info("/deleteCart get request");
 
     int index = goodsID.indexOf(",");
     if(index < 0) {
-      counterService.deleteCart(userId, goodsID);
+      counterService.deleteCart(userId, goodsID, Integer.valueOf(specId));
     }else {
       String []goodsIDs = goodsID.split(",");
+      String []specIds = specId.split(",");
       Map<String, String[]> map = new HashMap<>();
       map.put("userId", new String[]{userId});
       map.put("goodsID", goodsIDs);
+      map.put("specIds", specIds);
       counterService.deleteCarts(map);
     }
 
@@ -593,5 +618,26 @@ public class CounterController {
     logger.info("/newGoods get request");
     //Address address = counterService.queryAddressById(userId, addressNo);
     return ApiResponse.ok(0);
+  }
+
+  @GetMapping(value = "/newFeedback")
+  ApiResponse newFeedback(@RequestBody Feedback feedback) {
+    logger.info("/newFeedback get request");
+    counterService.newFeedback(feedback);
+    return ApiResponse.ok(0);
+  }
+
+  @GetMapping(value = "/getFeedbackByUser")
+  ApiResponse getFeedbackByUser(@RequestParam String userId) {
+    logger.info("/getFeedbackByUser get request");
+    List<Feedback> list = counterService.queryFeedbackByUser(userId);
+    return ApiResponse.ok(list);
+  }
+
+  @GetMapping(value = "/getFeedbackById")
+  ApiResponse getFeedbackById(@RequestParam String userId, @RequestParam int id) {
+    logger.info("/getFeedbackById get request");
+    Feedback feedback = counterService.queryFeedbackById(userId, id);
+    return ApiResponse.ok(feedback);
   }
 }

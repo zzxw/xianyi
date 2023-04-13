@@ -9,13 +9,13 @@ import java.util.Map;
 public interface CartMapper {
     List<Cart> queryCart(@Param("userId") String userId);
 
-    Cart queryCartByID(@Param("userId") String userId, @Param("goodsID") int goodsID);
+    Cart queryCartByID(@Param("userId") String userId, @Param("goodsID") int goodsID, @Param("specId") int specId);
 
     void createCart(Cart cart);
 
     void updateCart(Cart cart);
 
-    void deleteCart(@Param("userId") String userId, @Param("goodsID") String goodsID);
+    void deleteCart(@Param("userId") String userId, @Param("goodsID") String goodsID, @Param("specId") int specId);
     //void deleteCarts(@Param("userId") String userId, @Param("goodsIDs") String goodsIDs);
     void deleteCarts(@Param("info") Map<String, String[]> map);
 }

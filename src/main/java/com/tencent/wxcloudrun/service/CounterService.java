@@ -23,13 +23,13 @@ public interface CounterService {
 
   void updateCart(Cart cart);
 
-  void deleteCart(String userID, String goodsID);
+  void deleteCart(String userID, String goodsID, int specId);
   //void deleteCarts(String userID, String goodsIDs);
   void deleteCarts(Map<String, String[]> map);
 
   List<Cart> queryCart(String userID);
 
-  Cart queryCartByID(String userID, int goodsID);
+  Cart queryCartByID(String userID, int goodsID, int specId);
 
   void createOrder(Order order);
 
@@ -94,5 +94,11 @@ public interface CounterService {
   String sign(String prepareId, String timeStamp, String nonStr);
 
   String getSign(String prepareId, String timeStamp, String nonStr);
+
+  void newFeedback(Feedback feedback);
+
+  List<Feedback> queryFeedbackByUser(String userId);
+
+  Feedback queryFeedbackById(String userId, int id);
 
 }

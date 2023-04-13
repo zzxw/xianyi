@@ -6,6 +6,15 @@ public class OrderDetail {
     private int goodsId;
     private int num;
     private double totalPrice;
+    private int specId;
+
+    public int getSpecId() {
+        return specId;
+    }
+
+    public void setSpecId(int specId) {
+        this.specId = specId;
+    }
 
     public String getId() {
         return id;

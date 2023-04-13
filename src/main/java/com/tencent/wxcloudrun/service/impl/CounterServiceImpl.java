@@ -63,6 +63,7 @@ public class CounterServiceImpl implements CounterService {
   final OrderDetailMapper orderDetailMapper;
   final GoodsMapper goodsMapper;
   final PayMapper payMapper;
+  final FeedbackMapper feedbackMapper;
 
   private static final String MERCHANTSERIALNUMBER ="4884D435779D77A97A92A12D8A0B4D1E6B3EFAD0";
   private static final String MERCHANTID ="1639911327";
@@ -94,7 +95,7 @@ public class CounterServiceImpl implements CounterService {
           "vsOva8jS9gHW50EwoZ04Fww=";
 //  private static final String merchantId ="4884D435779D77A97A92A12D8A0B4D1E6B3EFAD0";
 
-  public CounterServiceImpl(@Autowired CountersMapper countersMapper, UserMapper userMapper, CartMapper cartMapper, OrderMapper orderMapper, AddressMapper addressMapper, OrderDetailMapper orderDetailMapper, GoodsMapper goodsMapper, PayMapper payMapper) {
+  public CounterServiceImpl(@Autowired CountersMapper countersMapper, UserMapper userMapper, CartMapper cartMapper, OrderMapper orderMapper, AddressMapper addressMapper, OrderDetailMapper orderDetailMapper, GoodsMapper goodsMapper, PayMapper payMapper, FeedbackMapper feedbackMapper) {
     this.countersMapper = countersMapper;
     this.userMapper = userMapper;
     this.cartMapper = cartMapper;
@@ -103,6 +104,7 @@ public class CounterServiceImpl implements CounterService {
     this.orderDetailMapper = orderDetailMapper;
     this.goodsMapper = goodsMapper;
     this.payMapper = payMapper;
+    this.feedbackMapper = feedbackMapper;
   }
 
   @Override
@@ -142,8 +144,8 @@ public class CounterServiceImpl implements CounterService {
   }
 
   @Override
-  public void deleteCart(String userID, String goodsID) {
-    cartMapper.deleteCart(userID, goodsID);
+  public void deleteCart(String userID, String goodsID, int specId) {
+    cartMapper.deleteCart(userID, goodsID, specId);
   }
 
   @Override
@@ -158,8 +160,8 @@ public class CounterServiceImpl implements CounterService {
   }
 
   @Override
-  public Cart queryCartByID(String userID, int goodsID) {
-    return cartMapper.queryCartByID(userID, goodsID);
+  public Cart queryCartByID(String userID, int goodsID, int specId) {
+    return cartMapper.queryCartByID(userID, goodsID, specId);
   }
 
   @Override
@@ -727,6 +729,21 @@ public class CounterServiceImpl implements CounterService {
       sign = Base64.getEncoder().encodeToString(signatureBytes);
     }
     return sign;
+  }
+
+  @Override
+  public void newFeedback(Feedback feedback) {
+    feedbackMapper.createFeedback(feedback);
+  }
+
+  @Override
+  public List<Feedback> queryFeedbackByUser(String userId) {
+    return feedbackMapper.queryFeedbackByUser(userId);
+  }
+
+  @Override
+  public Feedback queryFeedbackById(String userId, int id) {
+    return feedbackMapper.queryFeedBackById(userId, id);
   }
 
   public WechatPayHttpClientBuilder getBuild() {

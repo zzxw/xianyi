@@ -15,15 +15,22 @@
         <result property="level" column="level"/>
         <result property="stock" column="stock"/>
         <result property="specList" column="specList"/>
+        <result property="place" column="place"/>
+        <result property="factory" column="factory"/>
+        <result property="method" column="method"/>
+        <result property="life" column="life"/>
+        <result property="type" column="type"/>
+        <result property="remarks" column="remarks"/>
+        <result property="brand" column="brand"/>
 <!--        <result property="updatedAt" column="updatedAt" javaType="java.time.LocalDateTime"  />-->
     </resultMap>
     <select id="queryGoodsDetail" resultType="com.tencent.wxcloudrun.model.Goods">
-        SELECT `id`,`stock`, `desc`,`title`,`price`,`category`,`path`,`descPath`,`level`,`specList`
+        SELECT `id`,`stock`, `desc`,`title`,`price`,`category`,`path`,`descPath`,`level`,`specList`,`place`,`factory`,`method`,`life`,`type`,`remarks`,`brand`
         FROM `Goods`
         WHERE id = #{id}
     </select>
     <select id="queryGoods" resultType="com.tencent.wxcloudrun.model.Goods">
-        SELECT `id`,`stock`, `desc`,`title`,`price`,`category`,`path`,`descPath`,`level`,`specList`
+        SELECT `id`,`stock`, `desc`,`title`,`price`,`category`,`path`,`descPath`,`level`,`specList`,`place`,`factory`,`method`,`life`,`type`,`remarks`,`brand`
         FROM `Goods`
         LIMIT #{pageSize} OFFSET #{startIndex}
     </select>
