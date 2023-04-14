@@ -625,7 +625,7 @@ public class CounterController {
     return ApiResponse.ok(0);
   }
 
-  @GetMapping(value = "/newFeedback")
+  @PostMapping (value = "/newFeedback")
   ApiResponse newFeedback(@RequestBody Feedback feedback) {
     logger.info("/newFeedback get request");
     counterService.newFeedback(feedback);
