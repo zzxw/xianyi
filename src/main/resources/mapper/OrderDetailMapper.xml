@@ -34,6 +34,6 @@
 
     <insert id="newOrderDetail" parameterType="com.tencent.wxcloudrun.model.OrderDetail">
         INSERT INTO `OrderDetail`(`id`,`orderId`, `goodsId`,`num`,`totalPrice`,`specId`)
-            VALUE(#{id},#{orderId}, #{goodsId},#{num},#{totalPrice},#{totalPrice})
+            VALUE(#{id},#{orderId}, #{goodsId},#{num},#{totalPrice},#{specId})
     </insert>
 </mapper>

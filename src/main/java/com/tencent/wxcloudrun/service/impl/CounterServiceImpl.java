@@ -289,8 +289,15 @@ public class CounterServiceImpl implements CounterService {
         JSONArray specArr = JSON.parseArray(specStr);
         JSONObject specObj = specArr.getJSONObject(specId);
         List<String> specList = new ArrayList<>();
-        int price = specObj.getInteger("specPrice");
+        List<Map<String, String>> specificationList = new ArrayList<>();
+        int price = specObj.getInteger("specPrice") * 100;
         specList.add(specObj.getString("spec"));
+
+        Map<String ,String> specMap = new HashMap<>();
+        specMap.put("specTitle","规格");
+        specMap.put("specValue",specObj.getString("spec"));
+        specificationList.add(specMap);
+
         goodDetail.put("id", detail.getId());
         goodDetail.put("orderNo", null);
         goodDetail.put("spuId", goods.getId());
@@ -301,7 +308,7 @@ public class CounterServiceImpl implements CounterService {
         goodDetail.put("goodsViceType", 0);
         goodDetail.put("goodsName", goods.getTitle());
 
-        goodDetail.put("specifications", new ArrayList<>());
+        goodDetail.put("specifications", specificationList);
         goodDetail.put("specs",specList);
         String path = goods.getPath().split(",")[0];
 
