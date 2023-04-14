@@ -282,8 +282,15 @@ public class CounterServiceImpl implements CounterService {
         Goods goods = goodsMapper.queryGoodsDetail(detail.getGoodsId());
         Map<String, Object> goodDetail = new HashMap<>();
 
-        int price = (int)(goods.getPrice() * 100);
+        //int price = (int)(goods.getPrice() * 100);
         int totalPrice = (int)(detail.getTotalPrice() * 100);
+        int specId = detail.getSpecId();
+        String specStr = goods.getSpecList();
+        JSONArray specArr = JSON.parseArray(specStr);
+        JSONObject specObj = specArr.getJSONObject(specId);
+        List<String> specList = new ArrayList<>();
+        int price = specObj.getInteger("specPrice");
+        specList.add(specObj.getString("spec"));
         goodDetail.put("id", detail.getId());
         goodDetail.put("orderNo", null);
         goodDetail.put("spuId", goods.getId());
@@ -295,6 +302,7 @@ public class CounterServiceImpl implements CounterService {
         goodDetail.put("goodsName", goods.getTitle());
 
         goodDetail.put("specifications", new ArrayList<>());
+        goodDetail.put("specs",specList);
         String path = goods.getPath().split(",")[0];
 
         goodDetail.put("goodsPictureUrl", path);

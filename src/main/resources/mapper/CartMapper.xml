@@ -8,6 +8,7 @@
         <result property="num" column="num"/>
         <result property="date" column="time"/>
         <result property="price" column="price"/>
+        <result property="specId" column="specId"/>
 <!--        <result property="updatedAt" column="updatedAt" javaType="java.time.LocalDateTime"  />-->
     </resultMap>
 

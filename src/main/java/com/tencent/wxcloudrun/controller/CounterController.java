@@ -191,7 +191,7 @@ public class CounterController {
       item.setGoodsID(cart.getGoodsID());
       Cart oldCart = counterService.queryCartByID(cart.getUserId(), item.getGoodsID(), item.getSpecId());
       if(oldCart != null) {
-        item.setNum(cart.getNum() + oldCart.getNum());
+        item.setNum(item.getNum() + oldCart.getNum());
         counterService.updateCart(item);
       }else{
         //cart.setNum(num);
@@ -213,16 +213,21 @@ public class CounterController {
 //    cart.setNum(num);
 
     List<Spec> list = cart.getSpecList();
-    for (Spec spec: list
-         ) {
-      Cart item = new Cart();
-      item.setSpecId(spec.getSpecId());
-      item.setPrice(spec.getPrice());
-      item.setNum(spec.getBuyNum());
-      item.setUserId(cart.getUserId());
-      item.setGoodsID(cart.getGoodsID());
-      counterService.updateCart(item);
+    if(list!= null) {
+      for (Spec spec: list
+      ) {
+        Cart item = new Cart();
+        item.setSpecId(spec.getSpecId());
+        item.setPrice(spec.getPrice());
+        item.setNum(spec.getBuyNum());
+        item.setUserId(cart.getUserId());
+        item.setGoodsID(cart.getGoodsID());
+        counterService.updateCart(item);
+      }
+    }else {
+      counterService.updateCart(cart);
     }
+
     //counterService.updateCart(cart);
 
     return ApiResponse.ok(0);
