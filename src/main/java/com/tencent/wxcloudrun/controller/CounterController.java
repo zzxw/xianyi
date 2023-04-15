@@ -243,11 +243,14 @@ public class CounterController {
     }else {
       String []goodsIDs = goodsID.split(",");
       String []specIds = specId.split(",");
-      Map<String, String[]> map = new HashMap<>();
-      map.put("userId", new String[]{userId});
-      map.put("goodsID", goodsIDs);
-      map.put("specIds", specIds);
-      counterService.deleteCarts(map);
+      for(int i=0;i< goodsIDs.length;i++) {
+        counterService.deleteCart(userId, goodsIDs[i], Integer.valueOf(specIds[i]));
+      }
+//      Map<String, String[]> map = new HashMap<>();
+//      map.put("userId", new String[]{userId});
+//      map.put("goodsID", goodsIDs);
+//      map.put("specIds", specIds);
+//      counterService.deleteCarts(map);
     }
 
     return ApiResponse.ok(0);
@@ -422,7 +425,7 @@ public class CounterController {
 
   @PostMapping(value = "/updateOrderStatus")
     // ApiResponse updateOrder(@RequestParam String userId, @RequestParam String goodsID, @RequestParam int num, @RequestParam double price, @RequestParam int status, @RequestParam String orderID) {
-  ApiResponse updateOrderStatus(@RequestParam String orderId, @RequestParam int status) {
+  ApiResponse updateOrderStatus(@RequestBody Order order) {
     logger.info("/updateOrder post request");
 
 //    Order order = new Order();
@@ -433,9 +436,6 @@ public class CounterController {
 //    order.setStatus(status);
 //    order.setOrderID(orderID);
 
-    Order order = new Order();
-    order.setStatus(status);
-    order.setOrderID(orderId);
     counterService.updateOrderStatus(order);
     //counterService.updateOrder(order);
 
@@ -611,6 +611,13 @@ public class CounterController {
     return ApiResponse.ok(list);
   }
 
+  @GetMapping(value = "/queryGoodsByType")
+  ApiResponse queryGoodsByType(@RequestParam int page, @RequestParam int pageSize, @RequestParam int type) {
+    logger.info("/queryGoodsByType get request");
+
+    List<Goods> list = counterService.queryGoodsByType(page, pageSize, type);
+    return ApiResponse.ok(list);
+  }
   @GetMapping(value = "/deleteGoods")
   ApiResponse deleteGood(@RequestParam String id) {
     logger.info("/deleteGoods get request");

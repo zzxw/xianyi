@@ -69,6 +69,8 @@ public interface CounterService {
 
   List<Goods> queryGoods(int page, int pageSize);
 
+  List<Goods> queryGoodsByType(int page, int pageSize, int category);
+
   List<OrderDetail> getOrderDetails(String orderId);
 
   Map<String, Object> getOrderInfo(List<Order> orders,int page, int pageSize);

@@ -10,4 +10,6 @@ public interface GoodsMapper {
 
     List<Goods> queryGoods(@Param("startIndex") int startIndex, @Param("pageSize") int pageSize);
 
+    List<Goods> queryGoodsByType(@Param("startIndex") int startIndex, @Param("pageSize") int pageSize, @Param("category") int category);
+
 }

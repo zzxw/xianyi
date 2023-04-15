@@ -259,6 +259,12 @@ public class CounterServiceImpl implements CounterService {
   }
 
   @Override
+  public List<Goods> queryGoodsByType(int page, int pageSize, int category) {
+    int startIndex = (page-1) * pageSize;
+    return goodsMapper.queryGoodsByType(startIndex,pageSize,category);
+  }
+
+  @Override
   public List<OrderDetail> getOrderDetails(String orderId) {
     return orderDetailMapper.getOrderDetails(orderId);
   }

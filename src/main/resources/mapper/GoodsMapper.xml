@@ -34,6 +34,11 @@
         FROM `Goods`
         LIMIT #{pageSize} OFFSET #{startIndex}
     </select>
+    <select id="queryGoodsByType" resultType="com.tencent.wxcloudrun.model.Goods">
+        SELECT `id`,`stock`, `desc`,`title`,`price`,`category`,`path`,`descPath`,`level`,`specList`,`place`,`factory`,`method`,`life`,`type`,`remarks`,`brand`
+        FROM `Goods` WHERE category = #{category}
+        LIMIT #{pageSize} OFFSET #{startIndex}
+    </select>
 
 
 </mapper>

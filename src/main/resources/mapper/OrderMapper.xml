@@ -23,7 +23,7 @@
     <select id="queryOrderByUserId" resultMap="OrderMapper">
         SELECT `userID`, `price`,`createTime`,`status`,`orderID`,`addressNo`
         FROM `Order`
-        WHERE userID = #{userID}
+        WHERE userID = #{userID} AND status != -1
         LIMIT #{pageSize} OFFSET #{startIndex}
     </select>
     <select id="queryOrderByStatus" resultType="com.tencent.wxcloudrun.model.Order">
