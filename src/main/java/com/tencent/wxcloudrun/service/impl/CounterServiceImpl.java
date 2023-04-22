@@ -704,13 +704,13 @@ public class CounterServiceImpl implements CounterService {
   }
   public  PrivateKey getPrivateKey(String filename) throws IOException {
 
-    File file = ResourceUtils.getFile("classpath:" + filename);
-    String content = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
+//    File file = ResourceUtils.getFile("classpath:" + filename);
+//    String content = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
 
     //String content = FileCopyUtils.copyToString(new InputStreamReader(CounterServiceImpl.class.getClassLoader().getResourceAsStream(filename)));
 
-//    ClassPathResource classPathResource = new ClassPathResource(filename);
-//    String content = IOUtils.toString(classPathResource.getInputStream(),"utf-8");
+    ClassPathResource classPathResource = new ClassPathResource(filename);
+    String content = IOUtils.toString(classPathResource.getInputStream(),"utf-8");
 
 
     //String content = new String(Files.readAllBytes(Paths.get(filename)), "utf-8");
