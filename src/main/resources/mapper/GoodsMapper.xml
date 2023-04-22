@@ -39,6 +39,14 @@
         FROM `Goods` WHERE category = #{category}
         LIMIT #{pageSize} OFFSET #{startIndex}
     </select>
+    <select id="queryGoodsByCondition" resultType="com.tencent.wxcloudrun.model.Goods">
+        SELECT `id`,`stock`, `desc`,`title`,`price`,`category`,`path`,`descPath`,`level`,`specList`,`place`,`factory`,`method`,`life`,`type`,`remarks`,`brand`
+        FROM `Goods` WHERE 1=1
+        <if test="keyword != null">
+            AND title like CONCAT('%', #{keyword}, '%')
+        </if>
+        LIMIT #{pageSize} OFFSET #{startIndex}
+    </select>
 
 
 </mapper>

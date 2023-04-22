@@ -263,6 +263,12 @@ public class CounterServiceImpl implements CounterService {
   }
 
   @Override
+  public List<Goods> queryGoodsByCondition(int page, int pageSize, String keyword) {
+    int startIndex = (page-1) * pageSize;
+    return goodsMapper.queryGoodsByCondition(startIndex, pageSize, keyword);
+  }
+
+  @Override
   public List<Goods> queryGoodsByType(int page, int pageSize, int category) {
     int startIndex = (page-1) * pageSize;
     return goodsMapper.queryGoodsByType(startIndex,pageSize,category);
@@ -590,7 +596,8 @@ public class CounterServiceImpl implements CounterService {
 
 
     ObjectNode rootNode = objectMapper.createObjectNode();
-    int newPrice = (int) (order.getPrice() * 100);
+    //int newPrice = (int) (order.getPrice() * 100);
+    int newPrice = (int) order.getPrice();
     rootNode.put("mchid",MERCHANTID)
             .put("appid", APPID)
             .put("description", "test")

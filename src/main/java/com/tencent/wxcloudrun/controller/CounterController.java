@@ -646,6 +646,14 @@ public class CounterController {
     return ApiResponse.ok(list);
   }
 
+  @GetMapping(value = "/queryGoodsByCondition")
+  ApiResponse queryGoodsByCondition(@RequestParam int page, @RequestParam int pageSize, @RequestParam String keyword) {
+    logger.info("/queryGoodsByCondition get request");
+
+    List<Goods> list = counterService.queryGoodsByCondition(page, pageSize, keyword);
+    return ApiResponse.ok(list);
+  }
+
   @GetMapping(value = "/queryGoodsByType")
   ApiResponse queryGoodsByType(@RequestParam int page, @RequestParam int pageSize, @RequestParam int type) {
     logger.info("/queryGoodsByType get request");
