@@ -138,6 +138,11 @@ public class CounterServiceImpl implements CounterService {
   }
 
   @Override
+  public void updateUser(User user) {
+    userMapper.updateUser(user);
+  }
+
+  @Override
   public void createCart(Cart cart) {
     cartMapper.createCart(cart);
   }

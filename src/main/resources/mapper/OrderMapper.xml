@@ -11,23 +11,26 @@
         <result property="status" column="status"/>
         <result property="orderID" column="orderID"/>
         <result property="addressNo" column="addressNo"/>
+        <result property="deliveryId" column="deliveryId"/>
+        <result property="waybillId" column="waybillId"/>
+        <result property="closeTime" column="closeTime"/>
 <!--        <result property="updatedAt" column="updatedAt" javaType="java.time.LocalDateTime"  />-->
     </resultMap>
 
     <select id="queryOrderById" resultMap="OrderMapper" parameterType="java.lang.String">
-        SELECT `userID`, `price`,`createTime`,`status`,`orderID`,`addressNo`
+        SELECT `userID`, `price`,`createTime`,`status`,`orderID`,`addressNo`,`deliveryId`,`waybillId`,`closeTime`
         FROM `Order`
         WHERE orderID = #{orderID}
     </select>
 
     <select id="queryOrderByUserId" resultMap="OrderMapper">
-        SELECT `userID`, `price`,`createTime`,`status`,`orderID`,`addressNo`
+        SELECT `userID`, `price`,`createTime`,`status`,`orderID`,`addressNo`,`deliveryId`,`waybillId`,`closeTime`
         FROM `Order`
         WHERE userID = #{userID} AND status != -1
         LIMIT #{pageSize} OFFSET #{startIndex}
     </select>
     <select id="queryOrderByStatus" resultType="com.tencent.wxcloudrun.model.Order">
-        SELECT `userID`, `price`,`createTime`,`status`,`orderID`,`addressNo`
+        SELECT `userID`, `price`,`createTime`,`status`,`orderID`,`addressNo`,`deliveryId`,`waybillId`,`closeTime`
         FROM `Order`
         WHERE userID = #{userID} AND status = #{status}
         LIMIT #{pageSize} OFFSET #{startIndex}

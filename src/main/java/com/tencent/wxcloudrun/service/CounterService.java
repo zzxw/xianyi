@@ -19,6 +19,8 @@ public interface CounterService {
 
   void createUser(User userInfo);
 
+  void updateUser(User user);
+
   void createCart(Cart cart);
 
   void updateCart(Cart cart);

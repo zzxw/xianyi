@@ -6,31 +6,33 @@
         <id property="userId" column="userId"/>
         <result property="phoneNumber" column="phoneNumber"/>
         <result property="nickName" column="nickName"/>
+        <result property="avatarUrl" column="avatarUrl"/>
 <!--        <result property="updatedAt" column="updatedAt" javaType="java.time.LocalDateTime"  />-->
     </resultMap>
 
     <select id="getUser" resultMap="UserMapper" parameterType="java.lang.String">
-        SELECT `userId`, `phoneNumber`, `nickName`,`pwd`
+        SELECT `userId`, `phoneNumber`, `nickName`,`pwd`,`avatarUrl`
         FROM UserInfo
         WHERE userId = #{userId}
     </select>
 
-    <delete id="clearUser" parameterType="java.lang.String">
-        DELETE
-        FROM UserInfo
-        where userId = #{userId}
-        limit 1
-    </delete>
-
-    <update id="upsertCount" parameterType="com.tencent.wxcloudrun.model.User">
-        INSERT INTO `Counters`(`id`, `count`)
-        VALUE(#{id}, #{count}) 
-        ON DUPLICATE KEY UPDATE count=#{count}
+    <update id="updateUser" parameterType="com.tencent.wxcloudrun.model.User">
+        UPDATE `UserInfo` SET
+        <if test="nickName != null">
+            nickName = #{nickName}
+        </if>
+        <if test="nickName != null and avatarUrl != null ">
+            ,
+        </if>
+        <if test="avatarUrl != null">
+            avatarUrl = #{avatarUrl}
+        </if>
+        WHERE userId = #{userId}
     </update>
 
     <insert id="createUser" parameterType="com.tencent.wxcloudrun.model.User">
-        INSERT INTO `UserInfo`(`userId`, `phoneNumber`,`nickName`)
-            VALUE(#{userId}, #{phoneNumber},#{nickName})
+        INSERT INTO `UserInfo`(`userId`, `phoneNumber`,`nickName`,`avatarUrl`)
+            VALUE(#{userId}, #{phoneNumber},#{nickName},#{avatarUrl})
     </insert>
 
 </mapper>

@@ -7,4 +7,6 @@ public interface UserMapper {
     User getUser(@Param("userId") String userId);
 
     void createUser(User user);
+
+    void updateUser(User user);
 }

@@ -20,6 +20,36 @@ public class Order {
 
     int addressNo;
 
+    private String deliveryId;
+
+    private String waybillId;
+
+    private String closeTime;
+
+    public String getDeliveryId() {
+        return deliveryId;
+    }
+
+    public void setDeliveryId(String deliveryId) {
+        this.deliveryId = deliveryId;
+    }
+
+    public String getWaybillId() {
+        return waybillId;
+    }
+
+    public void setWaybillId(String waybillId) {
+        this.waybillId = waybillId;
+    }
+
+    public String getCloseTime() {
+        return closeTime;
+    }
+
+    public void setCloseTime(String closeTime) {
+        this.closeTime = closeTime;
+    }
+
     private List<OrderDetail> list;
 
     public String getUserID() {

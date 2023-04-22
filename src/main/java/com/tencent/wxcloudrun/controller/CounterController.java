@@ -84,12 +84,38 @@ public class CounterController {
     if(user != null) {
       String phoneNumber = user.getPhoneNumber();
       data.put("phoneNumber",  phoneNumber.substring(0, 3) + "****" + phoneNumber.substring(7));
+      String avatarUrl = user.getAvatarUrl();
+      String nickName = user.getNickName();
+      if(avatarUrl != null && !avatarUrl.isEmpty()){
+        data.put("avatarUrl",  avatarUrl);
+      }
+      if(nickName != null && !nickName.isEmpty()){
+        data.put("nickName",  nickName);
+      }
 //      User user = new User();
 //      user.setUserId(openId);
 //      counterService.createUser(user);
     }
     return ApiResponse.ok(data);
 
+  }
+
+  @PostMapping(value = "/updateUser")
+  ApiResponse getUser(@RequestBody User user) {
+    logger.info("/updateUser get request");
+
+    counterService.updateUser(user);
+    return ApiResponse.ok(0);
+
+  }
+
+  @GetMapping(value = "/getUserInfos")
+  ApiResponse getUserInfos(@RequestParam String userId) {
+    logger.info("/getUserInfos get request");
+
+    User user = counterService.getUser(userId);
+
+    return ApiResponse.ok(user);
   }
 
   @GetMapping(value = "/getUserInfo")
