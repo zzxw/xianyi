@@ -20,6 +20,8 @@ import org.w3c.dom.Document;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -201,6 +203,7 @@ public class CounterController {
 
     return ApiResponse.ok(0);
   }
+
 
   @PostMapping(value = "/updateCart")
   ApiResponse updateCart(@RequestBody Cart cart) {
@@ -651,5 +654,19 @@ public class CounterController {
     logger.info("/getFeedbackById get request");
     Feedback feedback = counterService.queryFeedbackById(userId, id);
     return ApiResponse.ok(feedback);
+  }
+
+  @PostMapping(value = "/newPayResult")
+    //ApiResponse newCart(@RequestParam String userId, @RequestParam String goodsID, @RequestParam int num, @RequestParam double price) {
+  ApiResponse newPayResult(@RequestBody PayResult payResult) {
+    logger.info("/newPayResult post request");
+
+    BigDecimal b1 = new BigDecimal(payResult.getTotalFee());
+    BigDecimal b2 = new BigDecimal(100);
+    BigDecimal b3 = b1.divide(b2, 2, RoundingMode.HALF_UP);
+    payResult.setTotalFee(b3.doubleValue());
+    counterService.insertResult(payResult);
+
+    return ApiResponse.ok(0);
   }
 }

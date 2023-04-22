@@ -103,4 +103,7 @@ public interface CounterService {
 
   Feedback queryFeedbackById(String userId, int id);
 
+  PayResult getResult(String id);
+
+  void insertResult(PayResult payResult);
 }

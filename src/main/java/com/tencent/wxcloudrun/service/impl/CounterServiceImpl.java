@@ -23,6 +23,8 @@ import com.wechat.pay.contrib.apache.httpclient.util.PemUtil;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -31,12 +33,12 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileCopyUtils;
+import org.springframework.util.ResourceUtils;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -441,7 +443,7 @@ public class CounterServiceImpl implements CounterService {
     Map<String, Object> map = new HashMap<>();
     map.put("saasId","8888888");
     map.put("storeId","1000");
-    map.put("storeName","云Mall深圳旗舰店");
+    map.put("storeName","海鲜旗舰店");
     map.put("uid","8888888");
     map.put("parentOrderNo",order.getOrderID());
     map.put("orderNo",order.getOrderID());
@@ -479,6 +481,8 @@ public class CounterServiceImpl implements CounterService {
     map.put("invoiceUrl", null);
 
     map.put("buttonVOs", getButtonInfo(orderStatus));
+    //物流信息节点
+    map.put("trajectoryVos", null);
     return map;
   }
 
@@ -519,9 +523,9 @@ public class CounterServiceImpl implements CounterService {
       LocalDateTime localDateTime = LocalDateTime.parse(success_time, DateTimeFormatter.ISO_DATE_TIME);
       JSONObject payerObj = result.getJSONObject("payer");
       String useId = payerObj.getString("openid");
-      PayResult payResult = new PayResult(bank, total, orderId, trade_type, transaction_id,localDateTime, useId);
-
-      payMapper.createPayResult(payResult);
+//      PayResult payResult = new PayResult(bank, total, orderId, trade_type, transaction_id,localDateTime, useId);
+//
+//      payMapper.createPayResult(payResult);
     }
 
 
@@ -683,7 +687,8 @@ public class CounterServiceImpl implements CounterService {
     try{
       Signature sign = Signature.getInstance("SHA256withRSA");
       //私钥，通过getPrivateKey来获取，这是个方法可以接调用 ，需要的是_key.pem文件的绝对路径配上文件名
-      sign.initSign(getPrivateKey("F:\\download\\WXCertUtil\\cert\\1639911327_20230329_cert\\apiclient_key.pem"));
+      //sign.initSign(getPrivateKey("F:\\download\\WXCertUtil\\cert\\1639911327_20230329_cert\\apiclient_key.pem"));
+      sign.initSign(getPrivateKey("apiclient_key.pem"));
       sign.update(str.getBytes("utf-8"));
       signStr = Base64.getEncoder().encodeToString(sign.sign());
     } catch (NoSuchAlgorithmException e) {
@@ -699,7 +704,17 @@ public class CounterServiceImpl implements CounterService {
   }
   public  PrivateKey getPrivateKey(String filename) throws IOException {
 
-    String content = new String(Files.readAllBytes(Paths.get(filename)), "utf-8");
+    File file = ResourceUtils.getFile("classpath:" + filename);
+    String content = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
+
+    //String content = FileCopyUtils.copyToString(new InputStreamReader(CounterServiceImpl.class.getClassLoader().getResourceAsStream(filename)));
+
+//    ClassPathResource classPathResource = new ClassPathResource(filename);
+//    String content = IOUtils.toString(classPathResource.getInputStream(),"utf-8");
+
+
+    //String content = new String(Files.readAllBytes(Paths.get(filename)), "utf-8");
+
     try {
       String privateKey = content.replace("-----BEGIN PRIVATE KEY-----", "")
               .replace("-----END PRIVATE KEY-----", "")
@@ -765,6 +780,16 @@ public class CounterServiceImpl implements CounterService {
   @Override
   public Feedback queryFeedbackById(String userId, int id) {
     return feedbackMapper.queryFeedBackById(userId, id);
+  }
+
+  @Override
+  public PayResult getResult(String id) {
+    return payMapper.getResult(id);
+  }
+
+  @Override
+  public void insertResult(PayResult payResult) {
+    payMapper.createPayResult(payResult);
   }
 
   public WechatPayHttpClientBuilder getBuild() {
@@ -931,6 +956,33 @@ public class CounterServiceImpl implements CounterService {
               + "?access_token=" + getToken();
       JSONObject jsonObject = new JSONObject();
       jsonObject.put("code", code);
+      String reqJsonStr = JSON.toJSONString(jsonObject);
+      phone = JSON.parseObject(HttpClientSslUtils.doPost(url, reqJsonStr));
+
+      if (phone == null) {
+        return null;
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return phone;
+  }
+
+  public JSONObject getTrace_waybill() {
+    JSONObject phone = null;
+    // 获取token
+    //String token_url = String.format("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s", APPID, SECRET);
+    try {
+
+      //获取phone
+      String url = "https://api.weixin.qq.com/cgi-bin/express/delivery/open_msg/trace_waybill"
+              + "?access_token=" + getToken();
+      JSONObject jsonObject = new JSONObject();
+      jsonObject.put("openid", "");
+      jsonObject.put("receiver_phone", "");
+      jsonObject.put("waybill_id", "");
+      jsonObject.put("goods_info", "");
+      jsonObject.put("trans_id", "");
       String reqJsonStr = JSON.toJSONString(jsonObject);
       phone = JSON.parseObject(HttpClientSslUtils.doPost(url, reqJsonStr));
 
