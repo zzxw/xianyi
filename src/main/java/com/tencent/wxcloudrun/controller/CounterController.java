@@ -374,19 +374,51 @@ public class CounterController {
       detail.setOrderId(orderID);
       counterService.newOrderDetail(detail);
     }
-    String prepay_id = counterService.payOrder(order);
-    String nonStr = Util.generateRandomString(32);
-    String timeStamp = Util.getTimeStamp();
-    //String sign = counterService.getSign(prepay_id, timeStamp, nonStr);
-    String sign = counterService.sign(prepay_id, timeStamp, nonStr);
-    Map<String, String> map = new HashMap<>();
-    map.put("appId", "wx7874f23b30f30672");
-    map.put("nonceStr",nonStr);
-    map.put("package",prepay_id);
-    map.put("paySign",sign);
-    map.put("signType","RSA");
-    map.put("timeStamp",timeStamp);
+//    String prepay_id = counterService.payOrder(order);
+//    String nonStr = Util.generateRandomString(32);
+//    String timeStamp = Util.getTimeStamp();
+//    //String sign = counterService.getSign(prepay_id, timeStamp, nonStr);
+//    String sign = counterService.sign(prepay_id, timeStamp, nonStr);
+//    Map<String, String> map = new HashMap<>();
+//    map.put("appId", "wx7874f23b30f30672");
+//    map.put("nonceStr",nonStr);
+//    map.put("package",prepay_id);
+//    map.put("paySign",sign);
+//    map.put("signType","RSA");
+//    map.put("timeStamp",timeStamp);
+    Map<String, String> map = counterService.getPayment(order);
     map.put("orderId", orderID);
+    return ApiResponse.ok(map);
+  }
+
+  @PostMapping(value = "/getPayment")
+    //ApiResponse newOrder(@RequestParam String userId, @RequestParam String goodsID, @RequestParam int num, @RequestParam double price, @RequestParam int status) {
+  ApiResponse getPayment(@RequestBody Order order) {
+    logger.info("/getPayment post request");
+
+//    Order order = new Order();
+//    order.setGoodsID(goodsID);
+//    order.setUserID(userId);
+//    order.setNum(num);
+//    order.setPrice(price);
+//    order.setStatus(status);
+
+
+//    String prepay_id = counterService.payOrder(order);
+//    String nonStr = Util.generateRandomString(32);
+//    String timeStamp = Util.getTimeStamp();
+//    //String sign = counterService.getSign(prepay_id, timeStamp, nonStr);
+//    String sign = counterService.sign(prepay_id, timeStamp, nonStr);
+//    Map<String, String> map = new HashMap<>();
+//    map.put("appId", "wx7874f23b30f30672");
+//    map.put("nonceStr",nonStr);
+//    map.put("package",prepay_id);
+//    map.put("paySign",sign);
+//    map.put("signType","RSA");
+//    map.put("timeStamp",timeStamp);
+//    map.put("orderId", order.getOrderID());
+    Map<String, String> map = counterService.getPayment(order);
+    map.put("orderId", order.getOrderID());
     return ApiResponse.ok(map);
   }
 

@@ -106,4 +106,6 @@ public interface CounterService {
   PayResult getResult(String id);
 
   void insertResult(PayResult payResult);
+
+  public Map<String, String> getPayment(Order order);
 }

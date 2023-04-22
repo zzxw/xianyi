@@ -7,10 +7,12 @@ import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.tencent.wxcloudrun.config.ApiResponse;
 import com.tencent.wxcloudrun.dao.*;
 import com.tencent.wxcloudrun.model.*;
 import com.tencent.wxcloudrun.service.CounterService;
 import com.tencent.wxcloudrun.util.HttpClientSslUtils;
+import com.tencent.wxcloudrun.util.Util;
 import com.wechat.pay.contrib.apache.httpclient.WechatPayHttpClientBuilder;
 import com.wechat.pay.contrib.apache.httpclient.auth.PrivateKeySigner;
 import com.wechat.pay.contrib.apache.httpclient.auth.Verifier;
@@ -298,7 +300,7 @@ public class CounterServiceImpl implements CounterService {
         JSONObject specObj = specArr.getJSONObject(specId);
         List<String> specList = new ArrayList<>();
         List<Map<String, String>> specificationList = new ArrayList<>();
-        int price = specObj.getInteger("specPrice") * 100;
+        int price = (int) (specObj.getDoubleValue("specPrice") * 100);
         specList.add(specObj.getString("spec"));
 
         Map<String ,String> specMap = new HashMap<>();
@@ -819,6 +821,24 @@ public class CounterServiceImpl implements CounterService {
   @Override
   public void insertResult(PayResult payResult) {
     payMapper.createPayResult(payResult);
+  }
+
+  @Override
+  public Map<String, String> getPayment(Order order) {
+    String prepay_id = payOrder(order);
+    String nonStr = Util.generateRandomString(32);
+    String timeStamp = Util.getTimeStamp();
+    //String sign = counterService.getSign(prepay_id, timeStamp, nonStr);
+    String sign = sign(prepay_id, timeStamp, nonStr);
+    Map<String, String> map = new HashMap<>();
+    map.put("appId", "wx7874f23b30f30672");
+    map.put("nonceStr",nonStr);
+    map.put("package",prepay_id);
+    map.put("paySign",sign);
+    map.put("signType","RSA");
+    map.put("timeStamp",timeStamp);
+
+    return map;
   }
 
   public WechatPayHttpClientBuilder getBuild() {
