@@ -845,7 +845,7 @@ public class CounterServiceImpl implements CounterService {
     Map<String, String> map = new HashMap<>();
     map.put("appId", "wx7874f23b30f30672");
     map.put("nonceStr",nonStr);
-    map.put("package",prepay_id);
+    map.put("package","prepay_id=" + prepay_id);
     map.put("paySign",sign);
     map.put("signType","RSA");
     map.put("timeStamp",timeStamp);
