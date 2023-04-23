@@ -638,7 +638,9 @@ public class CounterServiceImpl implements CounterService {
     }
     System.out.println(bodyAsString);
     JSONObject json = JSON.parseObject(bodyAsString);
-    return json.getString("prepay_id");
+    String prepayId = "prepay_id=" + json.getString("prepay_id");
+    System.out.println(prepayId);
+    return prepayId;
   }
 
   @Override
@@ -845,7 +847,7 @@ public class CounterServiceImpl implements CounterService {
     Map<String, String> map = new HashMap<>();
     map.put("appId", "wx7874f23b30f30672");
     map.put("nonceStr",nonStr);
-    map.put("package","prepay_id=" + prepay_id);
+    map.put("package",prepay_id);
     map.put("paySign",sign);
     map.put("signType","RSA");
     map.put("timeStamp",timeStamp);
