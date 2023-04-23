@@ -111,5 +111,5 @@ public interface CounterService {
 
   void insertResult(PayResult payResult);
 
-  public Map<String, String> getPayment(Order order);
+  Map<String, String> getPayment(Order order);
 }

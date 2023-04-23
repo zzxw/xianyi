@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.tencent.wxcloudrun.dao.RefundOrderMapper">
+
+    <resultMap id="RefundOrderMapper" type="com.tencent.wxcloudrun.model.RefundOrder">
+        <id property="id" column="id"/>
+<!--        <result property="goodsID" column="goodsID"/>-->
+<!--        <result property="num" column="num"/>-->
+        <result property="createTime" column="createTime"/>
+        <result property="orderId" column="orderId"/>
+        <result property="transactionId" column="transactionId"/>
+        <result property="totalFee" column="totalFee"/>
+        <result property="refundFee" column="refundFee"/>
+        <result property="reason" column="reason"/>
+        <result property="userId" column="userId"/>
+<!--        <result property="updatedAt" column="updatedAt" javaType="java.time.LocalDateTime"  />-->
+    </resultMap>
+
+    <select id="queryRefundOrderById" resultMap="RefundOrderMapper" parameterType="java.lang.String">
+        SELECT `userID`, `id`,`createTime`,`orderId`,`transactionId`,`totalFee`,`refundFee`,`reason`
+        FROM `RefundOrder`
+        WHERE id = #{id}
+    </select>
+
+    <select id="queryRefundOrderByUserId" resultMap="RefundOrderMapper">
+        SELECT `userID`, `id`,`createTime`,`orderId`,`transactionId`,`totalFee`,`refundFee`,`reason`
+        FROM `RefundOrder`
+        WHERE userID = #{userID} AND status != -1
+        LIMIT #{pageSize} OFFSET #{startIndex}
+    </select>
+    <select id="queryRefundOrderByStatus" resultType="com.tencent.wxcloudrun.model.RefundOrder">
+        SELECT `userID`, `id`,`createTime`,`orderId`,`transactionId`,`totalFee`,`refundFee`,`reason`
+        FROM `RefundOrder`
+        WHERE userID = #{userID} AND status = #{status}
+        LIMIT #{pageSize} OFFSET #{startIndex}
+    </select>
+    <select id="selectCountByStatus" resultType="java.lang.Integer">
+        SELECT count(1)
+        FROM `RefundOrder`
+        WHERE userID = #{userID} AND status = #{status}
+    </select>
+
+    <delete id="deleteRefundOrder" parameterType="java.lang.String">
+        DELETE
+        FROM `RefundOrder`
+        where id = #{id}
+        limit 1
+    </delete>
+
+    <update id="updateRefundOrder" parameterType="com.tencent.wxcloudrun.model.Order">
+        UPDATE `RefundOrder` SET status = #{status}  WHERE id = #{id}
+    </update>
+    <update id="updateRefundOrderStatus" parameterType="com.tencent.wxcloudrun.model.Order">
+        UPDATE `RefundOrder` SET status = #{status} WHERE id = #{id}
+    </update>
+
+    <insert id="createRefundOrder" parameterType="com.tencent.wxcloudrun.model.Order">
+        INSERT INTO `RefundOrder`(`userID`, `id`,`createTime`,`orderId`,`transactionId`,`totalFee`,`refundFee`,`reason`)
+            VALUE(#{userID},#{id}, #{createTime},#{orderId},#{transactionId},#{totalFee}, #{refundFee},#{reason})
+    </insert>
+
+</mapper>
