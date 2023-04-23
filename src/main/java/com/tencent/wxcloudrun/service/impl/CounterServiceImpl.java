@@ -509,6 +509,9 @@ public class CounterServiceImpl implements CounterService {
     String state = result.getString("trade_state");
     if("SUCCESS".equals(state)) {
       PayResult payResult = JSONObject.parseObject(notifyData, PayResult.class);
+      Order order = queryOrderByID(payResult.getOutTradeNo());
+      order.setStatus(1);
+      updateOrder(order);
       JSONObject payJson = result.getJSONObject("payer");
       String openId = payJson.getString("openid");
       JSONObject amountJson = result.getJSONObject("amount");
