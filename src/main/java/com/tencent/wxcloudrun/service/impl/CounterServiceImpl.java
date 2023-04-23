@@ -7,7 +7,6 @@ import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.tencent.wxcloudrun.config.ApiResponse;
 import com.tencent.wxcloudrun.dao.*;
 import com.tencent.wxcloudrun.model.*;
 import com.tencent.wxcloudrun.service.CounterService;
@@ -25,8 +24,6 @@ import com.wechat.pay.contrib.apache.httpclient.util.PemUtil;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -35,22 +32,17 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
-import org.springframework.util.FileCopyUtils;
-import org.springframework.util.ResourceUtils;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 @Service
@@ -68,6 +60,7 @@ public class CounterServiceImpl implements CounterService {
   final GoodsMapper goodsMapper;
   final PayMapper payMapper;
   final FeedbackMapper feedbackMapper;
+  final PromotionMapper promotionMapper;
 
   private static final String MERCHANTSERIALNUMBER ="4884D435779D77A97A92A12D8A0B4D1E6B3EFAD0";
   private static final String MERCHANTID ="1639911327";
@@ -99,7 +92,7 @@ public class CounterServiceImpl implements CounterService {
           "vsOva8jS9gHW50EwoZ04Fww=";
 //  private static final String merchantId ="4884D435779D77A97A92A12D8A0B4D1E6B3EFAD0";
 
-  public CounterServiceImpl(@Autowired CountersMapper countersMapper, UserMapper userMapper, CartMapper cartMapper, OrderMapper orderMapper, AddressMapper addressMapper, OrderDetailMapper orderDetailMapper, GoodsMapper goodsMapper, PayMapper payMapper, FeedbackMapper feedbackMapper) {
+  public CounterServiceImpl(@Autowired CountersMapper countersMapper, UserMapper userMapper, CartMapper cartMapper, OrderMapper orderMapper, AddressMapper addressMapper, OrderDetailMapper orderDetailMapper, GoodsMapper goodsMapper, PayMapper payMapper, FeedbackMapper feedbackMapper, PromotionMapper promotionMapper) {
     this.countersMapper = countersMapper;
     this.userMapper = userMapper;
     this.cartMapper = cartMapper;
@@ -109,6 +102,7 @@ public class CounterServiceImpl implements CounterService {
     this.goodsMapper = goodsMapper;
     this.payMapper = payMapper;
     this.feedbackMapper = feedbackMapper;
+    this.promotionMapper = promotionMapper;
   }
 
   @Override
@@ -514,28 +508,52 @@ public class CounterServiceImpl implements CounterService {
     JSONObject result = JSONObject.parseObject(notifyData);
     String state = result.getString("trade_state");
     if("SUCCESS".equals(state)) {
-      String orderId = result.getString("out_trade_no");
-      Order order = queryOrderByID(orderId);
-      order.setStatus(1);
-      updateOrder(order);
+      PayResult payResult = JSONObject.parseObject(notifyData, PayResult.class);
+      JSONObject payJson = result.getJSONObject("payer");
+      String openId = payJson.getString("openid");
       JSONObject amountJson = result.getJSONObject("amount");
-      //double total = Util.getRealFee(amountJson.getInteger("payer_total"), 100);
-      int total = amountJson.getInteger("payer_total");
-      String bank = result.getString("bank_type");
-      JSONArray array = result.getJSONArray("promotion_detail");
-      for(int i=0;i<array.size();i++) {
-        JSONObject promotion = array.getJSONObject(i);
-        //double amount = Util.getRealFee(promotion.getInteger("amount"), 100);
-        int amount = promotion.getInteger("amount");
-        String coupon_id = promotion.getString("coupon_id");
-        String name = promotion.getString("name");
+      int total = amountJson.getInteger("total");
+      int payerTotal = amountJson.getInteger("payer_total");
+      payResult.setOpenid(openId);
+      payResult.setTotalFee(Util.getRealFee(total,100));
+      payResult.setPayerTotal(Util.getRealFee(payerTotal,100));
+      String time = payResult.getSuccessTime();
+      ZonedDateTime dateTime = ZonedDateTime.parse(time);
+      payResult.setSuccessTime(String.valueOf(dateTime.toInstant().toEpochMilli()));
+      payMapper.createPayResult(payResult);
+
+      List<Promotion> promotionList = payResult.getPromotionList();
+      if(promotionList!= null){
+        for (Promotion promotion: promotionList
+             ) {
+          promotionMapper.newPromotion(promotion);
+        }
       }
-      String trade_type = result.getString("trade_type");
-      String transaction_id = result.getString("transaction_id");
-      String success_time = result.getString("success_time");
-      LocalDateTime localDateTime = LocalDateTime.parse(success_time, DateTimeFormatter.ISO_DATE_TIME);
-      JSONObject payerObj = result.getJSONObject("payer");
-      String useId = payerObj.getString("openid");
+//      String orderId = result.getString("out_trade_no");
+//      Order order = queryOrderByID(orderId);
+//      order.setStatus(1);
+//      updateOrder(order);
+//      JSONObject amountJson = result.getJSONObject("amount");
+//      //double total = Util.getRealFee(amountJson.getInteger("payer_total"), 100);
+//      int total = amountJson.getInteger("payer_total");
+//      String bank = result.getString("bank_type");
+//      JSONArray array = result.getJSONArray("promotion_detail");
+//      if(array != null){
+//        for(int i=0;i<array.size();i++) {
+//          JSONObject promotion = array.getJSONObject(i);
+//          //double amount = Util.getRealFee(promotion.getInteger("amount"), 100);
+//          int amount = promotion.getInteger("amount");
+//          String coupon_id = promotion.getString("coupon_id");
+//          String name = promotion.getString("name");
+//        }
+//      }
+//      String trade_type = result.getString("trade_type");
+//      String transaction_id = result.getString("transaction_id");
+//      String success_time = result.getString("success_time");
+//      LocalDateTime localDateTime = LocalDateTime.parse(success_time, DateTimeFormatter.ISO_DATE_TIME);
+//      JSONObject payerObj = result.getJSONObject("payer");
+//      String useId = payerObj.getString("openid");
+
 //      PayResult payResult = new PayResult(bank, total, orderId, trade_type, transaction_id,localDateTime, useId);
 //
 //      payMapper.createPayResult(payResult);

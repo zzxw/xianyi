@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.tencent.wxcloudrun.dao.PromotionMapper">
+
+    <resultMap id="PromotionMapper" type="com.tencent.wxcloudrun.model.Promotion">
+        <id property="couponId" column="couponId"/>
+        <result property="name" column="name"/>
+        <result property="scope" column="scope"/>
+        <result property="type" column="type"/>
+        <result property="amount" column="amount"/>
+        <result property="stockId" column="stockId"/>
+        <result property="wechatPay" column="wechatPay"/>
+        <result property="otherPay" column="otherPay"/>
+        <result property="transactionID" column="transactionID"/>
+        <result property="currency" column="currency"/>
+<!--        <result property="updatedAt" column="updatedAt" javaType="java.time.LocalDateTime"  />-->
+    </resultMap>
+<!--    <delete id="deleteByOrderId">-->
+<!--        DELETE-->
+<!--        FROM `OrderDetail`-->
+<!--        where orderID = #{orderID}-->
+<!--    </delete>-->
+
+
+    <select id="getPromotions" resultType="com.tencent.wxcloudrun.model.Promotion">
+        SELECT `couponId`, `name`,`scope`,`type`,`amount`,`stockId`, `wechatPay`,`otherPay`,`transactionID`,`currency`
+        FROM `Promotion`
+        WHERE transactionID = #{transactionID}
+    </select>
+    <select id="getPromotion" resultType="com.tencent.wxcloudrun.model.Promotion">
+        SELECT `couponId`, `name`,`scope`,`type`,`amount`,`stockId`, `wechatPay`,`otherPay`,`transactionID`,`currency`
+        FROM `Promotion`
+        WHERE couponId = #{couponId}
+    </select>
+
+
+    <insert id="newPromotion" parameterType="com.tencent.wxcloudrun.model.Promotion">
+        INSERT INTO `Promotion`(`couponId`, `name`,`scope`,`type`,`amount`,`stockId`, `wechatPay`,`otherPay`,`transactionID`,`currency`)
+            VALUE(#{couponId},#{name}, #{scope},#{type},#{amount},#{stockId}, #{wechatPay},#{otherPay},#{transactionID},#{currency})
+    </insert>
+</mapper>

@@ -6,19 +6,13 @@
         <id property="transactionID" column="transactionID"/>
         <result property="appid" column="appid"/>
         <result property="bankType" column="bankType"/>
-        <result property="cashFee" column="cashFee"/>
-        <result property="feeType" column="feeType"/>
-        <result property="isSubscribe" column="isSubscribe"/>
+        <result property="payerTotal" column="payerTotal"/>
+        <result property="attach" column="attach"/>
+        <result property="totalFee" column="totalFee"/>
         <result property="mchID" column="mchID"/>
-        <result property="nonceStr" column="nonceStr"/>
         <result property="openid" column="openid"/>
         <result property="outTradeNo" column="outTradeNo"/>
-        <result property="subAppid" column="subAppid"/>
-        <result property="subIsSubscribe" column="subIsSubscribe"/>
-        <result property="subMchID" column="subMchID"/>
-        <result property="subOpenid" column="subOpenid"/>
-        <result property="timeEnd" column="timeEnd"/>
-        <result property="totalFee" column="totalFee"/>
+        <result property="successTime" column="successTime"/>
         <result property="tradeType" column="tradeType"/>
 <!--        <result property="updatedAt" column="updatedAt" javaType="java.time.LocalDateTime"  />-->
     </resultMap>
@@ -27,17 +21,16 @@
     <update id="updateResult"></update>
     <select id="getResult" resultType="com.tencent.wxcloudrun.model.PayResult"
             parameterType="java.lang.String">
-        SELECT `appid`,`bankType`, `transactionID`,`cashFee`,`feeType`,`isSubscribe`,`mchID`,`nonceStr`,`openid`,`outTradeNo`,`subAppid`,`subIsSubscribe`,`subMchID`,`subOpenid`,`timeEnd`,`totalFee`,`tradeType`
+        SELECT `transactionID`,`appid`,`bankType`, `payerTotal`,`attach`,`totalFee`,`mchID`,`openid`,`outTradeNo`,`successTime`,`tradeType`
         FROM PayResult
         WHERE transactionID = #{transactionID}
     </select>
 
 
     <insert id="createPayResult">
-        INSERT INTO `PayResult`(`appid`,`bankType`, `transactionID`,`cashFee`,`feeType`,`isSubscribe`,`mchID`,`nonceStr`,
-                                `openid`,`outTradeNo`,`subAppid`,`subIsSubscribe`,`subMchID`,`subOpenid`,`timeEnd`,`totalFee`,`tradeType`)
-        VALUE(#{appid},#{bankType}, #{transactionID},#{cashFee},#{feeType},#{isSubscribe},#{mchID},#{nonceStr},#{openid}
-            ,#{outTradeNo},#{subAppid},#{subIsSubscribe},#{subMchID},#{subOpenid},#{timeEnd},#{totalFee},#{tradeType})
+        INSERT INTO `PayResult`(`transactionID`,`appid`,`bankType`, `payerTotal`,`attach`,`totalFee`,`mchID`,`openid`,`outTradeNo`,`successTime`,`tradeType`)
+        VALUE(#{transactionID},#{appid}, #{bankType},#{payerTotal},#{attach},#{totalFee},#{mchID},#{openid}
+            ,#{outTradeNo},#{successTime},#{tradeType})
     </insert>
 
 </mapper>

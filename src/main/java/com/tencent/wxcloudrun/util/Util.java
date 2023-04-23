@@ -40,6 +40,7 @@ public class Util {
         return b3.doubleValue();
     }
 
+
     public static String decode(String notifyData)  {
         Cipher cipher = null;
         String str = "";
