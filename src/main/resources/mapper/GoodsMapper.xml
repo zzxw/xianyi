@@ -22,6 +22,7 @@
         <result property="type" column="type"/>
         <result property="remarks" column="remarks"/>
         <result property="brand" column="brand"/>
+        <result property="status" column="status"/>
 <!--        <result property="updatedAt" column="updatedAt" javaType="java.time.LocalDateTime"  />-->
     </resultMap>
     <select id="queryGoodsDetail" resultType="com.tencent.wxcloudrun.model.Goods">
@@ -32,16 +33,18 @@
     <select id="queryGoods" resultType="com.tencent.wxcloudrun.model.Goods">
         SELECT `id`,`stock`, `desc`,`title`,`price`,`category`,`path`,`descPath`,`level`,`specList`,`place`,`factory`,`method`,`life`,`type`,`remarks`,`brand`
         FROM `Goods`
+        WHERE status = 0
         LIMIT #{pageSize} OFFSET #{startIndex}
     </select>
     <select id="queryGoodsByType" resultType="com.tencent.wxcloudrun.model.Goods">
         SELECT `id`,`stock`, `desc`,`title`,`price`,`category`,`path`,`descPath`,`level`,`specList`,`place`,`factory`,`method`,`life`,`type`,`remarks`,`brand`
         FROM `Goods` WHERE category = #{category}
+        WHERE status = 0
         LIMIT #{pageSize} OFFSET #{startIndex}
     </select>
     <select id="queryGoodsByCondition" resultType="com.tencent.wxcloudrun.model.Goods">
         SELECT `id`,`stock`, `desc`,`title`,`price`,`category`,`path`,`descPath`,`level`,`specList`,`place`,`factory`,`method`,`life`,`type`,`remarks`,`brand`
-        FROM `Goods` WHERE 1=1
+        FROM `Goods` WHERE 1=1 AND status = 0
         <if test="keyword != null">
             AND title like CONCAT('%', #{keyword}, '%')
         </if>

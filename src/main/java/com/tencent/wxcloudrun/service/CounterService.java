@@ -47,6 +47,8 @@ public interface CounterService {
 
   List<Order> queryOrderByStatus(String userID, int status,int page, int pageSize);
 
+  List<Order> queryOrdersByStatus(String userID, List<Integer> statusList,int page, int pageSize);
+
   int selectCountByStatus(String userID, int status);
 
   Order queryOrderByID(String orderID);
@@ -84,6 +86,8 @@ public interface CounterService {
   void newOrderDetail(OrderDetail detail);
 
   void notify(String notifyData);
+
+  void refundNotify(String notifyData);
 
   String payOrder(Order order);
 

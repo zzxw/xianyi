@@ -313,8 +313,17 @@ public class CounterController {
   ApiResponse getOrderByStatus(@RequestParam String userId, @RequestParam int status, @RequestParam(name = "page", defaultValue = "1") int page,
                                @RequestParam(name = "pageSize", defaultValue = "10")int pageSize) {
     logger.info("/getOrderByUserId get request");
+    List<Order> list = null;
+    if(status == 4|| status == 5 || status == 6){
+      List<Integer> statusList = new ArrayList<>();
+      statusList.add(4);
+      statusList.add(5);
+      statusList.add(6);
+      list = counterService.queryOrdersByStatus(userId,statusList,page, pageSize);
+    }else {
+      list = counterService.queryOrderByStatus(userId,status,page, pageSize);
+    }
 
-    List<Order> list = counterService.queryOrderByStatus(userId,status,page, pageSize);
     for(Order order: list) {
       order.setList(counterService.getOrderDetails(order.getOrderID()));
     }
@@ -330,8 +339,10 @@ public class CounterController {
     int preCount = counterService.selectCountByStatus(userId, 0);
     int waitCount = counterService.selectCountByStatus(userId, 1);
     int ingCount = counterService.selectCountByStatus(userId, 2);
-    int finshCount = counterService.selectCountByStatus(userId, 3);
+    int finishCount = counterService.selectCountByStatus(userId, 3);
     int tuiCount = counterService.selectCountByStatus(userId, 4);
+    int auditCount = counterService.selectCountByStatus(userId, 5);
+    int refundFinishCount = counterService.selectCountByStatus(userId, 6);
     Map<String, Integer> preMap = new HashMap<>();
     preMap.put("orderNum",preCount);
     preMap.put("tabType",5);
@@ -348,12 +359,12 @@ public class CounterController {
     list.add(ingMap);
 
     Map<String, Integer> finshMap = new HashMap<>();
-    finshMap.put("orderNum",finshCount);
+    finshMap.put("orderNum",finishCount);
     finshMap.put("tabType", 60);
     list.add(finshMap);
 
     Map<String, Integer> tuiMap = new HashMap<>();
-    tuiMap.put("orderNum",tuiCount);
+    tuiMap.put("orderNum",tuiCount + auditCount + refundFinishCount);
     tuiMap.put("tabType", 80);
     list.add(tuiMap);
     return ApiResponse.ok(list);
@@ -560,13 +571,23 @@ public class CounterController {
   @PostMapping(value = "/payNotify")
   ApiResponse notify(@RequestBody String notifyData) {
     logger.info("/payNotify get request");
-    logger.info("回调通知数据为:");
+    logger.info("支付回调通知数据为:");
     logger.info(notifyData);
+    //counterService.refundNotify(notifyData);
     String decodeData = Util.decode(notifyData);
     counterService.notify(decodeData);
     return ApiResponse.ok(0);
   }
-
+  @PostMapping(value = "/refundNotify")
+  ApiResponse refundNotify(@RequestBody String notifyData) {
+    logger.info("/refundNotify get request");
+    logger.info("退款回调通知数据为:");
+    logger.info(notifyData);
+    counterService.refundNotify(notifyData);
+//    String decodeData = Util.decode(notifyData);
+//    counterService.notify(decodeData);
+    return ApiResponse.ok(0);
+  }
 
   @GetMapping(value = "/deleteAddress")
   ApiResponse deleteAddress(@RequestParam String userId, @RequestParam int addressNo) {

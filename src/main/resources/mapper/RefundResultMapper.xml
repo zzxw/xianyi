@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.tencent.wxcloudrun.dao.RefundResultMapper">
+
+    <resultMap id="RefundResultMapper" type="com.tencent.wxcloudrun.model.RefundResult">
+        <id property="refundID" column="refundID"/>
+        <result property="outRefundNo" column="outRefundNo"/>
+        <result property="transactionID" column="transactionID"/>
+        <result property="outTradeNo" column="outTradeNo"/>
+        <result property="channel" column="channel"/>
+        <result property="userReceivedAccount" column="userReceivedAccount"/>
+        <result property="successTime" column="successTime"/>
+        <result property="createTime" column="createTime"/>
+        <result property="status" column="status"/>
+        <result property="fundsAccount" column="fundsAccount"/>
+
+        <result property="total" column="total"/>
+        <result property="refund" column="refund"/>
+        <result property="payerTotal" column="payerTotal"/>
+        <result property="payerRefund" column="payerRefund"/>
+        <result property="settlementTotal" column="settlementTotal"/>
+        <result property="settlementRefund" column="settlementRefund"/>
+        <result property="discountRefund" column="discountRefund"/>
+        <result property="currency" column="currency"/>
+    </resultMap>
+
+
+    <update id="updateRefundPay"></update>
+    <select id="getRefundResult" resultType="com.tencent.wxcloudrun.model.RefundResult"
+            parameterType="java.lang.String">
+        SELECT `refundID`,`outRefundNo`,`transactionID`, `outTradeNo`,`channel`,`userReceivedAccount`,`successTime`,`createTime`,
+               `status`,`fundsAccount`,`total`,`refund`, `payerTotal`,`payerRefund`,`settlementTotal`,`settlementRefund`,`discountRefund`,`currency`
+        FROM RefundResult
+        WHERE outRefundNo = #{outRefundNo}
+    </select>
+
+
+    <insert id="createRefundPayResult">
+        INSERT INTO `RefundResult`(`refundID`,`outRefundNo`,`transactionID`, `outTradeNo`,`channel`,`userReceivedAccount`,`successTime`,`createTime`,
+                                   `status`,`fundsAccount`,`total`,`refund`, `payerTotal`,`payerRefund`,`settlementTotal`,`settlementRefund`,`discountRefund`,`currency`)
+        VALUE(#{refundID},#{outRefundNo}, #{transactionID},#{outTradeNo},#{channel},#{userReceivedAccount},#{successTime},#{createTime}
+            ,#{status},#{fundsAccount},#{total},#{refund},#{payerTotal},#{payerRefund},#{settlementTotal},#{settlementRefund},#{discountRefund},#{currency})
+    </insert>
+
+</mapper>

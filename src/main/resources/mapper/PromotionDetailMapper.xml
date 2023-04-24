@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.tencent.wxcloudrun.dao.PromotionDetailMapper">
+
+    <resultMap id="PromotionDetailMapper" type="com.tencent.wxcloudrun.model.PromotionDetail">
+        <id property="promotionID" column="promotionID"/>
+        <result property="scope" column="scope"/>
+        <result property="type" column="type"/>
+        <result property="amount" column="amount"/>
+        <result property="refundAmount" column="refundAmount"/>
+        <result property="refundId" column="refundId"/>
+<!--        <result property="updatedAt" column="updatedAt" javaType="java.time.LocalDateTime"  />-->
+    </resultMap>
+<!--    <delete id="deleteByOrderId">-->
+<!--        DELETE-->
+<!--        FROM `OrderDetail`-->
+<!--        where orderID = #{orderID}-->
+<!--    </delete>-->
+
+
+    <select id="getPromotionDetails" resultType="com.tencent.wxcloudrun.model.PromotionDetail">
+        SELECT `promotionID`, `scope`,`type`,`amount`,`refundAmount`,`refundId`
+        FROM `PromotionDetail`
+        WHERE refundId = #{refundId}
+    </select>
+    <select id="getPromotionDetail" resultType="com.tencent.wxcloudrun.model.PromotionDetail">
+        SELECT `promotionID`, `scope`,`type`,`amount`,`refundAmount`,`refundId`
+        FROM `PromotionDetail`
+        WHERE promotionID = #{promotionID}
+    </select>
+
+
+    <insert id="newPromotionDetail" parameterType="com.tencent.wxcloudrun.model.PromotionDetail">
+        INSERT INTO `PromotionDetail`(`promotionID`, `scope`,`type`,`amount`,`refundAmount`,`refundId`)
+            VALUE(#{promotionID},#{scope}, #{type},#{amount},#{refundAmount},#{refundId})
+    </insert>
+</mapper>

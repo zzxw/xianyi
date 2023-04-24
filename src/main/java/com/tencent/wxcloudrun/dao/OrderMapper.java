@@ -12,6 +12,8 @@ public interface OrderMapper {
 
     List<Order> queryOrderByStatus(@Param("userID") String userID, @Param("status") int status, @Param("startIndex")int startIndex, @Param("pageSize")int pageSize);
 
+    List<Order> queryOrdersByStatus(@Param("userID") String userID, @Param("statusList")List<Integer> statusList, @Param("startIndex")int startIndex, @Param("pageSize")int pageSize);
+
     void createOrder(Order order);
 
     void updateOrder(Order order);

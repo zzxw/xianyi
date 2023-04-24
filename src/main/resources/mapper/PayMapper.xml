@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.tencent.wxcloudrun.dao.PayMapper">
 
-    <resultMap id="OrderMapper" type="com.tencent.wxcloudrun.model.PayResult">
+    <resultMap id="PayMapper" type="com.tencent.wxcloudrun.model.PayResult">
         <id property="transactionID" column="transactionID"/>
         <result property="appid" column="appid"/>
         <result property="bankType" column="bankType"/>
@@ -23,7 +23,7 @@
             parameterType="java.lang.String">
         SELECT `transactionID`,`appid`,`bankType`, `payerTotal`,`attach`,`totalFee`,`mchID`,`openid`,`outTradeNo`,`successTime`,`tradeType`
         FROM PayResult
-        WHERE transactionID = #{transactionID}
+        WHERE outTradeNo = #{outTradeNo}
     </select>
 
 

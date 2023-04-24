@@ -15,6 +15,7 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.time.ZonedDateTime;
 import java.util.Base64;
 
 public class Util {
@@ -33,11 +34,20 @@ public class Util {
         return String.valueOf(timeStamp);
     }
 
+    public static String getTimeStamp(String time) {
+        ZonedDateTime dateTime = ZonedDateTime.parse(time);
+        return String.valueOf(dateTime.toInstant().toEpochMilli());
+    }
+
     public static double getRealFee(int num1, int num2) {
         BigDecimal b1 = new BigDecimal(num1);
         BigDecimal b2 = new BigDecimal(num2);
         BigDecimal b3 = b1.divide(b2, 2, RoundingMode.HALF_UP);
         return b3.doubleValue();
+    }
+
+    public static double getDefaultRealFee(int num1) {
+        return getRealFee(num1,100);
     }
 
 

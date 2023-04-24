@@ -12,6 +12,6 @@ public interface PayMapper {
 
     void updateResult(PayResult pay);
 
-    PayResult getResult(@Param("id")String id);
+    PayResult getResult(@Param("outTradeNo")String outTradeNo);
 
 }
