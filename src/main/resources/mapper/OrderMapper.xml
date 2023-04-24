@@ -27,14 +27,14 @@
         SELECT `userID`, `price`,`createTime`,`status`,`orderID`,`addressNo`,`deliveryId`,`waybillId`,`closeTime`
         FROM `Order`
         WHERE userID = #{userID} AND status != -1
-        ORDER BY createTime ASC
+        ORDER BY createTime DESC
         LIMIT #{pageSize} OFFSET #{startIndex}
     </select>
     <select id="queryOrderByStatus" resultType="com.tencent.wxcloudrun.model.Order">
         SELECT `userID`, `price`,`createTime`,`status`,`orderID`,`addressNo`,`deliveryId`,`waybillId`,`closeTime`
         FROM `Order`
         WHERE userID = #{userID} AND status = #{status}
-        ORDER BY createTime ASC
+        ORDER BY createTime DESC
         LIMIT #{pageSize} OFFSET #{startIndex}
     </select>
     <select id="selectCountByStatus" resultType="java.lang.Integer">
@@ -50,7 +50,7 @@
         <foreach collection="statusList" item="status" index="index" open="(" close=")" separator=",">
             #{status}
         </foreach>
-        ORDER BY createTime ASC
+        ORDER BY createTime DESC
             LIMIT #{pageSize} OFFSET #{startIndex}
     </select>
 
