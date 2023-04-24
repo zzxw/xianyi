@@ -211,7 +211,8 @@ public class CounterServiceImpl implements CounterService {
 
   @Override
   public List<Order> queryOrdersByStatus(String userID, List<Integer> statusList, int page, int pageSize) {
-    return orderMapper.queryOrdersByStatus(userID,statusList,page,pageSize);
+    int startIndex = (page-1) * pageSize;
+    return orderMapper.queryOrdersByStatus(userID,statusList,startIndex,pageSize);
   }
 
   @Override
