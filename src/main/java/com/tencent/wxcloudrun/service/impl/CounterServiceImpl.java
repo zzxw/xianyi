@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.sun.org.apache.xpath.internal.operations.Or;
 import com.tencent.wxcloudrun.dao.*;
 import com.tencent.wxcloudrun.model.*;
 import com.tencent.wxcloudrun.service.CounterService;
@@ -42,7 +43,6 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.*;
 
 @Service
@@ -63,6 +63,9 @@ public class CounterServiceImpl implements CounterService {
   final PromotionMapper promotionMapper;
   final PromotionDetailMapper promotionDetailMapper;
   final RefundResultMapper refundResultMapper;
+  final RefundOrderMapper refundOrderMapper;
+
+  String wayBillToken = "";
 
   private static final String MERCHANTSERIALNUMBER ="4884D435779D77A97A92A12D8A0B4D1E6B3EFAD0";
   private static final String MERCHANTID ="1639911327";
@@ -94,7 +97,7 @@ public class CounterServiceImpl implements CounterService {
           "vsOva8jS9gHW50EwoZ04Fww=";
 //  private static final String merchantId ="4884D435779D77A97A92A12D8A0B4D1E6B3EFAD0";
 
-  public CounterServiceImpl(@Autowired CountersMapper countersMapper, UserMapper userMapper, CartMapper cartMapper, OrderMapper orderMapper, AddressMapper addressMapper, OrderDetailMapper orderDetailMapper, GoodsMapper goodsMapper, PayMapper payMapper, FeedbackMapper feedbackMapper, PromotionMapper promotionMapper, PromotionDetailMapper promotionDetailMapper, RefundResultMapper refundResultMapper) {
+  public CounterServiceImpl(@Autowired CountersMapper countersMapper, UserMapper userMapper, CartMapper cartMapper, OrderMapper orderMapper, AddressMapper addressMapper, OrderDetailMapper orderDetailMapper, GoodsMapper goodsMapper, PayMapper payMapper, FeedbackMapper feedbackMapper, PromotionMapper promotionMapper, PromotionDetailMapper promotionDetailMapper, RefundResultMapper refundResultMapper, RefundOrderMapper refundOrderMapper) {
     this.countersMapper = countersMapper;
     this.userMapper = userMapper;
     this.cartMapper = cartMapper;
@@ -107,6 +110,7 @@ public class CounterServiceImpl implements CounterService {
     this.promotionMapper = promotionMapper;
     this.promotionDetailMapper = promotionDetailMapper;
     this.refundResultMapper = refundResultMapper;
+    this.refundOrderMapper = refundOrderMapper;
   }
 
   @Override
@@ -243,6 +247,29 @@ public class CounterServiceImpl implements CounterService {
   @Override
   public void deleteAddress(String userID, int addressNo) {
     addressMapper.deleteAddress(userID, addressNo);
+  }
+
+  @Override
+  public String getWayToken() {
+    if(wayBillToken.length() == 0) {
+      JSONObject phone = null;
+      try {
+
+        //获取phone
+        String url = "https://api.weixin.qq.com/cgi-bin/express/delivery/open_msg/trace_waybill?access_token" + getToken();
+        JSONObject jsonObject = new JSONObject();
+        //jsonObject.put("code", code);
+        String reqJsonStr = JSON.toJSONString(jsonObject);
+        phone = JSON.parseObject(HttpClientSslUtils.doPost(url, reqJsonStr));
+
+        if (phone == null) {
+          return null;
+        }
+      } catch (Exception e) {
+        e.printStackTrace();
+      };
+    }
+    return wayBillToken;
   }
 
   @Override
@@ -521,10 +548,36 @@ public class CounterServiceImpl implements CounterService {
 
     map.put("buttonVOs", getButtonInfo(orderStatus));
     //物流信息节点
-    map.put("trajectoryVos", null);
+    map.put("trajectoryVos", getTrajectoryVos(order));
     return map;
   }
 
+  public List<Map<String,Object>> getTrajectoryVos(Order order){
+    List<Map<String,Object>> list = new ArrayList<>();
+    if(order.getWaybillId() != null) {
+      Map<String, Object>map = new HashMap<>();
+      String title = "已发货";
+      if(order.getStatus() == 3) {
+        title = "已签收";
+      }
+
+      map.put("title", title);
+      map.put("icon","deliver");
+      map.put("code","200003");
+      map.put("isShow",true);
+      List<Map<String,String>> nodeList = new ArrayList<>();
+      Map<String,String>nodes = new HashMap<>();
+      nodes.put("status","商家已发货，点击查看物流详情");
+      nodes.put("timestamp",order.getWayTime());
+      nodes.put("remark",null);
+      nodeList.add(nodes);
+      map.put("nodes", nodeList);
+      list.add(map);
+    }else {
+      return null;
+    }
+    return list;
+  }
   @Override
   public OrderDetail getOrderDetail(String id) {
     return orderDetailMapper.getOrderDetail(id);
@@ -619,59 +672,73 @@ public class CounterServiceImpl implements CounterService {
 //    }
   }
 
+  public RefundResult getRefundResult(String str) {
+    RefundResult refundResult = JSONObject.parseObject(str, RefundResult.class);
+    Amount amount = refundResult.getAmount();
+    refundResult.setTotal(Util.getDefaultRealFee(amount.getTotal()));
+    refundResult.setRefund(Util.getDefaultRealFee(amount.getRefund()));
+    refundResult.setPayerTotal(Util.getDefaultRealFee(amount.getPayerTotal()));
+    refundResult.setPayerRefund(Util.getDefaultRealFee(amount.getPayerRefund()));
+    refundResult.setSettlementRefund(Util.getDefaultRealFee(amount.getSettlementRefund()));
+    refundResult.setSettlementTotal(Util.getDefaultRealFee(amount.getSettlementTotal()));
+    refundResult.setDiscountRefund(Util.getDefaultRealFee(amount.getDiscountRefund()));
+    refundResult.setCurrency(amount.getCurrency());
+    refundResult.setCreateTime(Util.getTimeStamp(refundResult.getCreateTime()));
+    refundResult.setSuccessTime(Util.getTimeStamp(refundResult.getSuccessTime()));
+    return refundResult;
+  }
+
   @Override
-  public void refundNotify(String notifyData) {
-    JSONObject result = JSONObject.parseObject(notifyData);
-    String state = result.getString("status");
-    if("SUCCESS".equals(state)) {
-      //PayResult payResult = JSONObject.parseObject(notifyData, PayResult.class);
-      RefundResult refundResult = JSONObject.parseObject(notifyData, RefundResult.class);
-      Amount amount = refundResult.getAmount();
-      refundResult.setTotal(Util.getDefaultRealFee(amount.getTotal()));
-      refundResult.setRefund(Util.getDefaultRealFee(amount.getRefund()));
-      refundResult.setPayerTotal(Util.getDefaultRealFee(amount.getPayerTotal()));
-      refundResult.setPayerRefund(Util.getDefaultRealFee(amount.getPayerRefund()));
-      refundResult.setSettlementRefund(Util.getDefaultRealFee(amount.getSettlementRefund()));
-      refundResult.setSettlementTotal(Util.getDefaultRealFee(amount.getSettlementTotal()));
-      refundResult.setDiscountRefund(Util.getDefaultRealFee(amount.getDiscountRefund()));
-      refundResult.setCurrency(amount.getCurrency());
-      refundResult.setCreateTime(Util.getTimeStamp(refundResult.getCreateTime()));
-      refundResult.setSuccessTime(Util.getTimeStamp(refundResult.getSuccessTime()));
+  public void refundNotify(String notifyData, RefundOrder refundOrder) {
+    //JSONObject result = JSONObject.parseObject(notifyData);
+    //String state = result.getString("status");
+    //if("SUCCESS".equals(state)) {
+    try{
+      RefundResult refundResult = getRefundResult(notifyData);
       String refundId = refundResult.getRefundID();
+
+
+
       refundResultMapper.createRefundPayResult(refundResult);
       PromotionDetail[] promotionDetails = refundResult.getPromotionDetail();
       if(promotionDetails != null) {
         for (PromotionDetail promotionDetail: promotionDetails
-           ) {
+        ) {
           promotionDetail.setRefundId(refundId);
           promotionDetail.setAmount(Util.getDefaultRealFee((int)promotionDetail.getAmount()));
           promotionDetail.setRefundAmount(Util.getDefaultRealFee((int)promotionDetail.getRefundAmount()));
           promotionDetailMapper.newPromotionDetail(promotionDetail);
         }
       }
-//      Order order = queryOrderByID(payResult.getOutTradeNo());
-//      order.setStatus(1);
-//      updateOrder(order);
-//      JSONObject payJson = result.getJSONObject("payer");
-//      String openId = payJson.getString("openid");
-//      JSONObject amountJson = result.getJSONObject("amount");
-//      int total = amountJson.getInteger("total");
-//      int payerTotal = amountJson.getInteger("payer_total");
-//      payResult.setOpenid(openId);
-//      payResult.setTotalFee(Util.getRealFee(total, 100));
-//      payResult.setPayerTotal(Util.getRealFee(payerTotal, 100));
-//      String time = payResult.getSuccessTime();
-//      ZonedDateTime dateTime = ZonedDateTime.parse(time);
-//      payResult.setSuccessTime(String.valueOf(dateTime.toInstant().toEpochMilli()));
-//      payMapper.createPayResult(payResult);
-//
-//      List<Promotion> promotionList = payResult.getPromotionList();
-//      if (promotionList != null) {
-//        for (Promotion promotion : promotionList
-//        ) {
-//          promotionMapper.newPromotion(promotion);
-//        }
-//      }
+    }catch (Exception e) {
+      refundOrder.setStatus(-1);
+      refundOrder.setFailReason(notifyData);
+      refundOrderMapper.updateRefundOrder(refundOrder);
+      e.printStackTrace();
+    }
+
+    //}
+  }
+
+  @Override
+  public void updateRefundNotify(String notifyData) {
+    JSONObject result = JSONObject.parseObject(notifyData);
+    String state = result.getString("refund_status");
+    if("SUCCESS".equals(state)) {
+      RefundResult refundResult = getRefundResult(notifyData);
+      refundResult.setStatus("SUCCESS");
+      Order order = new Order();
+      order.setOrderID(refundResult.getOutTradeNo());
+      order.setStatus(6);
+      orderMapper.updateOrderStatus(order);
+
+      RefundOrder refundOrder = new RefundOrder();
+      refundOrder.setId(refundResult.getOutRefundNo());
+      refundOrder.setStatus(1);
+      refundOrder.setFailReason("");
+      refundOrderMapper.updateRefundOrder(refundOrder);
+
+      refundResultMapper.updateRefundPay(refundResult);
     }
   }
 
@@ -693,6 +760,12 @@ public class CounterServiceImpl implements CounterService {
   }
 
 
+  public String getGoodsTitle(String orderId) {
+    List<OrderDetail> list = orderDetailMapper.getOrderDetails(orderId);
+    Goods goods = goodsMapper.queryGoodsDetail(list.get(0).getGoodsId());
+    return goods.getTitle();
+  }
+
   @Override
   public String payOrder(Order order)  {
     WechatPayHttpClientBuilder builder = getBuild();
@@ -707,13 +780,14 @@ public class CounterServiceImpl implements CounterService {
     CloseableHttpClient httpClient = builder.build();
     ObjectMapper objectMapper = new ObjectMapper();
 
+    String title = getGoodsTitle(order.getOrderID());
 
     ObjectNode rootNode = objectMapper.createObjectNode();
     int newPrice = (int) (order.getPrice() * 100);
     //int newPrice = (int) order.getPrice();
     rootNode.put("mchid",MERCHANTID)
             .put("appid", APPID)
-            .put("description", "test")
+            .put("description", title)
             .put("notify_url", "https://springboot-v3w5-37027-5-1317305634.sh.run.tcloudbase.com/payNotify")
             .put("out_trade_no", order.getOrderID());
     rootNode.putObject("amount")
@@ -769,10 +843,10 @@ public class CounterServiceImpl implements CounterService {
     //int newPrice = (int) order.getPrice();
     rootNode.put("transaction_id",refundOrder.getTransactionId())
             .put("out_refund_no", refundOrder.getId())
-            .put("notify_url", "https://springboot-v3w5-37027-5-1317305634.sh.run.tcloudbase.com/payNotify");
+            .put("notify_url", "https://springboot-v3w5-37027-5-1317305634.sh.run.tcloudbase.com/refundNotify");
     rootNode.putObject("amount")
-            .put("refund", refundOrder.getRefundFee() * 100)
-            .put("total", refundOrder.getTotalFee() * 100)
+            .put("refund", (int)(refundOrder.getRefundFee() * 100))
+            .put("total", (int)(refundOrder.getTotalFee() * 100))
             .put("currency", "CNY");
 
     String bodyAsString = null;
@@ -800,6 +874,8 @@ public class CounterServiceImpl implements CounterService {
       }
     }
     System.out.println(bodyAsString);
+    //退款结果入库
+    refundNotify(bodyAsString,refundOrder);
     JSONObject json = JSON.parseObject(bodyAsString);
     System.out.println(json);
 //    String prepayId = "prepay_id=" + json.getString("prepay_id");
@@ -852,8 +928,11 @@ public class CounterServiceImpl implements CounterService {
 
 
   @Override
-  public void refundOrder() {
-
+  public void newRefundOrder(RefundOrder refundOrder) {
+    //入库
+    refundOrderMapper.createRefundOrder(refundOrder);
+    //向微信发起退款请求
+    refundOrder(refundOrder);
   }
 
   @Override
@@ -1206,8 +1285,13 @@ public class CounterServiceImpl implements CounterService {
       JSONObject jsonObject = new JSONObject();
       jsonObject.put("openid", "");
       jsonObject.put("receiver_phone", "");
+      jsonObject.put("sender_phone", "");
+      jsonObject.put("delivery_id", "");
       jsonObject.put("waybill_id", "");
-      jsonObject.put("goods_info", "");
+      JSONObject goodsInfo = new JSONObject();
+
+      jsonObject.put("goods_info", goodsInfo);
+
       jsonObject.put("trans_id", "");
       String reqJsonStr = JSON.toJSONString(jsonObject);
       phone = JSON.parseObject(HttpClientSslUtils.doPost(url, reqJsonStr));

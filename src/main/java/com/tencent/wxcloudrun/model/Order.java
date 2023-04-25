@@ -26,6 +26,16 @@ public class Order {
 
     private String closeTime;
 
+    private String wayTime;
+
+    public String getWayTime() {
+        return wayTime;
+    }
+
+    public void setWayTime(String wayTime) {
+        this.wayTime = wayTime;
+    }
+
     public String getDeliveryId() {
         return deliveryId;
     }

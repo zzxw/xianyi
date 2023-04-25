@@ -34,7 +34,15 @@ public class Util {
         return String.valueOf(timeStamp);
     }
 
+    public static String getFullTimeStamp() {
+        long timeStamp = System.currentTimeMillis();
+        return String.valueOf(timeStamp);
+    }
+
     public static String getTimeStamp(String time) {
+        if(time == null) {
+            return null;
+        }
         ZonedDateTime dateTime = ZonedDateTime.parse(time);
         return String.valueOf(dateTime.toInstant().toEpochMilli());
     }

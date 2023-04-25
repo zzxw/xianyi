@@ -63,6 +63,8 @@ public interface CounterService {
 
   void deleteAddress(String userID, int addressNo);
 
+  String getWayToken();
+
   void updateAddress(Address address);
 
   void updateDefaultAddress(String userId);
@@ -87,7 +89,9 @@ public interface CounterService {
 
   void notify(String notifyData);
 
-  void refundNotify(String notifyData);
+  void refundNotify(String notifyData, RefundOrder refundOrder);
+
+  void updateRefundNotify(String notifyData);
 
   String payOrder(Order order);
 
@@ -99,7 +103,8 @@ public interface CounterService {
 
   void closeOrder(String orderId);
 
-  void refundOrder();
+  void newRefundOrder(RefundOrder refundOrder);
+
 
   String sign(String prepareId, String timeStamp, String nonStr);
 

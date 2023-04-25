@@ -319,6 +319,7 @@ public class CounterController {
       statusList.add(4);
       statusList.add(5);
       statusList.add(6);
+      statusList.add(7);
       list = counterService.queryOrdersByStatus(userId,statusList,page, pageSize);
     }else {
       list = counterService.queryOrderByStatus(userId,status,page, pageSize);
@@ -340,9 +341,14 @@ public class CounterController {
     int waitCount = counterService.selectCountByStatus(userId, 1);
     int ingCount = counterService.selectCountByStatus(userId, 2);
     int finishCount = counterService.selectCountByStatus(userId, 3);
+    //待商家审核
     int tuiCount = counterService.selectCountByStatus(userId, 4);
+    //商家拒绝退款
     int auditCount = counterService.selectCountByStatus(userId, 5);
+    //退款完成
     int refundFinishCount = counterService.selectCountByStatus(userId, 6);
+    //待商家退款
+    int ingRefundCount = counterService.selectCountByStatus(userId, 7);
     Map<String, Integer> preMap = new HashMap<>();
     preMap.put("orderNum",preCount);
     preMap.put("tabType",5);
@@ -364,7 +370,7 @@ public class CounterController {
     list.add(finshMap);
 
     Map<String, Integer> tuiMap = new HashMap<>();
-    tuiMap.put("orderNum",tuiCount + auditCount + refundFinishCount);
+    tuiMap.put("orderNum",tuiCount + auditCount + refundFinishCount + ingRefundCount);
     tuiMap.put("tabType", 80);
     list.add(tuiMap);
     return ApiResponse.ok(list);
@@ -495,6 +501,28 @@ public class CounterController {
     return ApiResponse.ok(0);
   }
 
+
+  @PostMapping(value = "/newRefundOrder")
+    // ApiResponse updateOrder(@RequestParam String userId, @RequestParam String goodsID, @RequestParam int num, @RequestParam double price, @RequestParam int status, @RequestParam String orderID) {
+  ApiResponse newRefundOrder(@RequestBody RefundOrder refundOrder) {
+    logger.info("/newRefundOrder post request");
+//    Order order = new Order();
+//    order.setGoodsID(goodsID);
+//    order.setUserID(userId);
+//    order.setNum(num);
+//    order.setPrice(price);
+//    order.setStatus(status);
+//    order.setOrderID(orderID);
+
+    //counterService
+    //counterService.updateOrder(refundOrder);
+    String id = OrderUtil.getIDByTime();
+    refundOrder.setId(id);
+    refundOrder.setCreateTime(Util.getFullTimeStamp());
+    counterService.newRefundOrder(refundOrder);
+    return ApiResponse.ok(0);
+  }
+
   @PostMapping(value = "/updateOrderStatus")
     // ApiResponse updateOrder(@RequestParam String userId, @RequestParam String goodsID, @RequestParam int num, @RequestParam double price, @RequestParam int status, @RequestParam String orderID) {
   ApiResponse updateOrderStatus(@RequestBody Order order) {
@@ -583,7 +611,10 @@ public class CounterController {
     logger.info("/refundNotify get request");
     logger.info("退款回调通知数据为:");
     logger.info(notifyData);
-    counterService.refundNotify(notifyData);
+    String decodeData = Util.decode(notifyData);
+    logger.info("退款回调解码数据为:");
+    logger.info(decodeData);
+    counterService.updateRefundNotify(decodeData);
 //    String decodeData = Util.decode(notifyData);
 //    counterService.notify(decodeData);
     return ApiResponse.ok(0);
@@ -594,6 +625,15 @@ public class CounterController {
     logger.info("/deleteAddress get request");
 
     counterService.deleteAddress(userId, addressNo);
+
+    return ApiResponse.ok(0);
+  }
+
+  @GetMapping(value = "/getWayToken")
+  ApiResponse getWayToken() {
+    logger.info("/getWayToken get request");
+
+    counterService.getWayToken();
 
     return ApiResponse.ok(0);
   }

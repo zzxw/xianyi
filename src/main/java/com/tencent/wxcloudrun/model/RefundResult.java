@@ -14,6 +14,7 @@ public class RefundResult {
     private String status;
     private String fundsAccount;
     private Amount amount;
+    private String mchID;
     private PromotionDetail[] promotionDetail;
     private double total;
     private double refund;
@@ -23,6 +24,7 @@ public class RefundResult {
     private double settlementTotal;
     private double discountRefund;
     private String currency;
+
     public double getTotal() {
         return total;
     }
@@ -147,4 +149,9 @@ public class RefundResult {
     public PromotionDetail[] getPromotionDetail() { return promotionDetail; }
     @JsonProperty("promotion_detail")
     public void setPromotionDetail(PromotionDetail[] value) { this.promotionDetail = value; }
+
+    @JsonProperty("mchid")
+    public String getmchID() { return mchID; }
+    @JsonProperty("mchid")
+    public void setmchID(String value) { this.mchID = value; }
 }

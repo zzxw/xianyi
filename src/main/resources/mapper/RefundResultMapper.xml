@@ -13,7 +13,6 @@
         <result property="createTime" column="createTime"/>
         <result property="status" column="status"/>
         <result property="fundsAccount" column="fundsAccount"/>
-
         <result property="total" column="total"/>
         <result property="refund" column="refund"/>
         <result property="payerTotal" column="payerTotal"/>
@@ -25,7 +24,9 @@
     </resultMap>
 
 
-    <update id="updateRefundPay"></update>
+    <update id="updateRefundPay">
+        UPDATE `RefundResult` SET successTime = #{successTime}, status = #{status}  WHERE refundID = #{refundID}
+    </update>
     <select id="getRefundResult" resultType="com.tencent.wxcloudrun.model.RefundResult"
             parameterType="java.lang.String">
         SELECT `refundID`,`outRefundNo`,`transactionID`, `outTradeNo`,`channel`,`userReceivedAccount`,`successTime`,`createTime`,

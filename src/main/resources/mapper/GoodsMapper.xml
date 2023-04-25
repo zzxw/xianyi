@@ -39,7 +39,7 @@
     <select id="queryGoodsByType" resultType="com.tencent.wxcloudrun.model.Goods">
         SELECT `id`,`stock`, `desc`,`title`,`price`,`category`,`path`,`descPath`,`level`,`specList`,`place`,`factory`,`method`,`life`,`type`,`remarks`,`brand`
         FROM `Goods` WHERE category = #{category}
-        WHERE status = 0
+        AND status = 0
         LIMIT #{pageSize} OFFSET #{startIndex}
     </select>
     <select id="queryGoodsByCondition" resultType="com.tencent.wxcloudrun.model.Goods">
