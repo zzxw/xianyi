@@ -519,6 +519,13 @@ public class CounterController {
     String id = OrderUtil.getIDByTime();
     refundOrder.setId(id);
     refundOrder.setCreateTime(Util.getFullTimeStamp());
+    String transactionId = refundOrder.getTransactionId();
+    if( transactionId== null|| transactionId.trim().isEmpty()) {
+      PayResult payResult = counterService.getResult(refundOrder.getOrderId());
+      refundOrder.setTransactionId(payResult.getTransactionID());
+      refundOrder.setRefundFee(payResult.getPayerTotal());
+      refundOrder.setTotalFee(payResult.getTotalFee());
+    }
     counterService.newRefundOrder(refundOrder);
     return ApiResponse.ok(0);
   }

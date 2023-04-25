@@ -548,34 +548,36 @@ public class CounterServiceImpl implements CounterService {
 
     map.put("buttonVOs", getButtonInfo(orderStatus));
     //物流信息节点
-    map.put("trajectoryVos", getTrajectoryVos(order));
+    String wayId = order.getWaybillId();
+    if(wayId != null && !wayId.trim().isEmpty()){
+      map.put("trajectoryVos", getTrajectoryVos(order));
+      map.put("wayId",wayId);
+      map.put("deliveryId", order.getDeliveryId());
+    }
+
     return map;
   }
 
   public List<Map<String,Object>> getTrajectoryVos(Order order){
     List<Map<String,Object>> list = new ArrayList<>();
-    if(order.getWaybillId() != null) {
-      Map<String, Object>map = new HashMap<>();
-      String title = "已发货";
-      if(order.getStatus() == 3) {
-        title = "已签收";
-      }
-
-      map.put("title", title);
-      map.put("icon","deliver");
-      map.put("code","200003");
-      map.put("isShow",true);
-      List<Map<String,String>> nodeList = new ArrayList<>();
-      Map<String,String>nodes = new HashMap<>();
-      nodes.put("status","商家已发货，点击查看物流详情");
-      nodes.put("timestamp",order.getWayTime());
-      nodes.put("remark",null);
-      nodeList.add(nodes);
-      map.put("nodes", nodeList);
-      list.add(map);
-    }else {
-      return null;
+    Map<String, Object>map = new HashMap<>();
+    String title = "已发货";
+    if(order.getStatus() == 3) {
+      title = "已签收";
     }
+
+    map.put("title", title);
+    map.put("icon","deliver");
+    map.put("code","200003");
+    map.put("isShow",true);
+    List<Map<String,String>> nodeList = new ArrayList<>();
+    Map<String,String>nodes = new HashMap<>();
+    nodes.put("status","商家已发货，点击查看物流详情");
+    nodes.put("timestamp",order.getWayTime());
+    nodes.put("remark",null);
+    nodeList.add(nodes);
+    map.put("nodes", nodeList);
+    list.add(map);
     return list;
   }
   @Override
