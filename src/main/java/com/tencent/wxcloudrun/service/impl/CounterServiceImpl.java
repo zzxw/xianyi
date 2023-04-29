@@ -187,6 +187,10 @@ public class CounterServiceImpl implements CounterService {
 
   @Override
   public void updateOrderStatus(Order order) {
+    if(order.getStatus() == 4){
+      order.setRefundTime(Util.getFullTimeStamp());
+      order.setCloseTime(Util.getPlusDayTimeStamp());
+    }
     orderMapper.updateOrderStatus(order);
   }
 
@@ -598,6 +602,7 @@ public class CounterServiceImpl implements CounterService {
       PayResult payResult = JSONObject.parseObject(notifyData, PayResult.class);
       Order order = queryOrderByID(payResult.getOutTradeNo());
       order.setStatus(1);
+      order.setOriginalStatus(1);
       updateOrder(order);
       JSONObject payJson = result.getJSONObject("payer");
       String openId = payJson.getString("openid");
@@ -971,34 +976,6 @@ public class CounterServiceImpl implements CounterService {
 
 //    ClassPathResource classPathResource = new ClassPathResource(filename);
 //    String content = IOUtils.toString(classPathResource.getInputStream(),"utf-8");
-//    String content = "-----BEGIN PRIVATE KEY-----\n" +
-//            "MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDeDbOnafXVVMzj\n" +
-//            "/71xivDebiOHelu4W4pCMX3vfzuZDoL0Q/5zGeAgR1o0sRgaDCjpgMO5bpWBdPsm\n" +
-//            "wOOCtfYmB+K4mgNjSeiE9Q9UebwEy9uq3ZAkNwReJNZH1f+53FhSgvMy+1rQ4ntK\n" +
-//            "Ecziv0lA9EzcOzZpTvyF28VPBlGIenSmsVLRKzaSQlJaTH2Qas3nCKWddgDY1Cx2\n" +
-//            "2dm/Ad1DuMIomEsqfjCZgIQTvup3N83w/lSKbuHmWJ175ce+KFAfXBQ5EKeNK39O\n" +
-//            "i4kgP2115m+Crro3aDXe9PUVwkqBu7AfvRXEQ5tXt5YuFKiURKFX9nO/ah7AzGRe\n" +
-//            "XBIB4ig5AgMBAAECggEAG6vrcnZy6zXZHqSVEBw3bhCdntlxqqTFswAF6J2baLR1\n" +
-//            "P0ll4SQdWQhrRlu3XC+dvZONUINmYC6aybaJ45UXap/a8hRHTc09C6yaT3WoJ5Tb\n" +
-//            "+AwKVWkBw1Wl2mfhqWC7JPUqp3TJWXSP1qgnNy6NS2nmVh+O5Uqxj2DW0sU/zdjx\n" +
-//            "S+XkUYG4J9ONtVTPu0fdQXilBfCVL9CHW0yH9n5GY32OcCKkZCTmwEnBHF+tM4a9\n" +
-//            "VsVEj/wbaO88abOvlSkXIdrKeIlbVI+6bpweUx9ktp4QjNN7/HAlYxKSAqemkSbZ\n" +
-//            "vZUCknTr9CC7xg0zdE+SSrRkKs7mfkNWTAq39lTu8QKBgQD45yPgpHFYuMXB/sNR\n" +
-//            "xBrMZIe7ydso1QMqqYV1n2+Kcrub57LfzjaNQ3IGUrv2bsW2N9OBhSBABBoPJjQj\n" +
-//            "hMDh8VILAh+ALVUm/4urj6gd2QhwlsBn89sj9Yb12CjaS2MqWd9xzMVYSdHB8kgk\n" +
-//            "+XVLUnNPKcPX/IKWLSt27U92lQKBgQDkYpNNBIIlBLirCUzEGpBfgUC7uuq1ZZer\n" +
-//            "o2SGolaVFqQBLmZT26DJ0pvA7HaZyFB2hyblSY6YsrxFxYAzUm2Yp6mrUvhuH8PR\n" +
-//            "40dN5myfk0BCWXuiKpiEQQLCzJPaEqFHebwok1wVEZM0eLRMo8YiAqt1GvXijK+5\n" +
-//            "Vd0h1XI2FQKBgH6ZYmBCg/xyjvOrV0Fhk5fekkNr2nMcVW3/p4g6PguXa+FSqmK3\n" +
-//            "inuzkG2y6zPfB+U04/l+8vZcn7yQ2/gs78Z8bhR3UfpqFGOvmyT5/rKfz3Ek3FyD\n" +
-//            "ZjUWDz1AYxcVPS0vZT2Gv+G2OmCBkTxtPcHAADKFtb1IDEvCUdc9wSs5AoGAPfFa\n" +
-//            "gEYbwkyQhZslHf8Sb0TQONqOdBqU03Gifz2ifBdC7isWh+IGrxaXNfEsjbMd17f6\n" +
-//            "Xa/gpBu+IrJZfhH6NbArvZLoXH3zD4c0PLWlenZmtFguxyIEccJsLEduRnRNF+S1\n" +
-//            "ms+05uX4Zf/i7vJwd6L/u+hPDl4X/w2Bx35r1q0CgYEAgqKZwPrWHWyGpT9d4B5F\n" +
-//            "pj1U9xupk9u8WyeW0qUT533Twmcz52mNXOl7SFCg8MRPYNa/c2hs6gLrIXnOJJHd\n" +
-//            "vP7NUJtXqWdz1a0ka8dLjmOuf8mouUOb+U+8tB4Vm/0ETowC3dlQ6XTwqen2ruDK\n" +
-//            "vsOva8jS9gHW50EwoZ04Fww=\n" +
-//            "-----END PRIVATE KEY-----\n";
 
       //String content = FileCopyUtils.copyToString(new InputStreamReader(CounterServiceImpl.class.getClassLoader().getResourceAsStream(filename)));
     //content = FileCopyUtils.copyToString(new InputStreamReader(CounterServiceImpl.class.getClassLoader().getResourceAsStream(filename)));

@@ -2,7 +2,7 @@ package com.tencent.wxcloudrun.model;
 
 public class RefundOrder {
     private String id;
-    private String orderId;
+    private String orderID;
     private String transactionId;
     private double totalFee;
     private double refundFee;
@@ -45,12 +45,12 @@ public class RefundOrder {
         this.id = id;
     }
 
-    public String getOrderId() {
-        return orderId;
+    public String getOrderID() {
+        return orderID;
     }
 
-    public void setOrderId(String orderId) {
-        this.orderId = orderId;
+    public void setOrderID(String orderID) {
+        this.orderID = orderID;
     }
 
     public String getTransactionId() {

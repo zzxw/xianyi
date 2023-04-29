@@ -28,6 +28,63 @@ public class Order {
 
     private String wayTime;
 
+    private Integer originalStatus;
+
+    private String receive;
+    private String phone;
+    private String refundTime;
+    private String remark;
+    private String dealTime;
+    public Integer getOriginalStatus() {
+        return originalStatus;
+    }
+
+    public void setOriginalStatus(Integer originalStatus) {
+        this.originalStatus = originalStatus;
+    }
+
+    public String getReceive() {
+        return receive;
+    }
+
+    public void setReceive(String receive) {
+        this.receive = receive;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getRefundTime() {
+        return refundTime;
+    }
+
+    public void setRefundTime(String refundTime) {
+        this.refundTime = refundTime;
+    }
+
+    public String getDealTime() {
+        return dealTime;
+    }
+
+    public void setDealTime(String dealTime) {
+        this.dealTime = dealTime;
+    }
+
+
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
     public String getWayTime() {
         return wayTime;
     }

@@ -15,24 +15,31 @@
         <result property="waybillId" column="waybillId"/>
         <result property="closeTime" column="closeTime"/>
         <result property="wayTime" column="wayTime"/>
+        <result property="remark" column="remark"/>
+
+        <result property="originalStatus" column="originalStatus"/>
+        <result property="receive" column="receive"/>
+        <result property="phone" column="phone"/>
+        <result property="refundTime" column="refundTime"/>
+        <result property="dealTime" column="dealTime"/>
 <!--        <result property="updatedAt" column="updatedAt" javaType="java.time.LocalDateTime"  />-->
     </resultMap>
 
     <select id="queryOrderById" resultMap="OrderMapper" parameterType="java.lang.String">
-        SELECT `userID`, `price`,`createTime`,`status`,`orderID`,`addressNo`,`deliveryId`,`waybillId`,`closeTime`,`wayTime`
+        SELECT `userID`, `price`,`createTime`,`status`,`orderID`,`addressNo`,`deliveryId`,`waybillId`,`closeTime`,`wayTime`,`remark`,`originalStatus`,`receive`,`phone`,`refundTime`,`dealTime`
         FROM `Order`
         WHERE orderID = #{orderID}
     </select>
 
     <select id="queryOrderByUserId" resultMap="OrderMapper">
-        SELECT `userID`, `price`,`createTime`,`status`,`orderID`,`addressNo`,`deliveryId`,`waybillId`,`closeTime`,`wayTime`
+        SELECT `userID`, `price`,`createTime`,`status`,`orderID`,`addressNo`,`deliveryId`,`waybillId`,`closeTime`,`wayTime`,`remark`,`originalStatus`,`receive`,`phone`,`refundTime`,`dealTime`
         FROM `Order`
         WHERE userID = #{userID} AND status != -1
         ORDER BY createTime DESC
         LIMIT #{pageSize} OFFSET #{startIndex}
     </select>
     <select id="queryOrderByStatus" resultType="com.tencent.wxcloudrun.model.Order">
-        SELECT `userID`, `price`,`createTime`,`status`,`orderID`,`addressNo`,`deliveryId`,`waybillId`,`closeTime`,`wayTime`
+        SELECT `userID`, `price`,`createTime`,`status`,`orderID`,`addressNo`,`deliveryId`,`waybillId`,`closeTime`,`wayTime`,`remark`,`originalStatus`,`receive`,`phone`,`refundTime`,`dealTime`
         FROM `Order`
         WHERE userID = #{userID} AND status = #{status}
         ORDER BY createTime DESC
@@ -44,7 +51,7 @@
         WHERE userID = #{userID} AND status = #{status}
     </select>
     <select id="queryOrdersByStatus" resultType="com.tencent.wxcloudrun.model.Order">
-        SELECT `userID`, `price`,`createTime`,`status`,`orderID`,`addressNo`,`deliveryId`,`waybillId`,`closeTime`,`wayTime`
+        SELECT `userID`, `price`,`createTime`,`status`,`orderID`,`addressNo`,`deliveryId`,`waybillId`,`closeTime`,`wayTime`,`remark`,`originalStatus`,`receive`,`phone`,`refundTime`,`dealTime`
         FROM `Order`
         WHERE userID = #{userID} AND
               status in
@@ -63,15 +70,25 @@
     </delete>
 
     <update id="updateOrder" parameterType="com.tencent.wxcloudrun.model.Order">
-        UPDATE `Order` SET status = #{status}, addressNo = #{addressNo}  WHERE orderID = #{orderID}
+        UPDATE `Order` SET status = #{status}, addressNo = #{addressNo}
+        <if test="originalStatus != null">
+            ,originalStatus = #{originalStatus}
+        </if>WHERE orderID = #{orderID}
     </update>
     <update id="updateOrderStatus" parameterType="com.tencent.wxcloudrun.model.Order">
-        UPDATE `Order` SET status = #{status} WHERE orderID = #{orderID}
+        UPDATE `Order` SET status = #{status}
+        <if test="refundTime != null and refundTime!=''">
+            ,refundTime = #{refundTime}
+        </if>
+        <if test="closeTime != null and closeTime!=''">
+            ,closeTime = #{closeTime}
+        </if>
+        WHERE orderID = #{orderID}
     </update>
 
     <insert id="createOrder" parameterType="com.tencent.wxcloudrun.model.Order">
-        INSERT INTO `Order`(`userID`,`price`, `status`,`orderID`,`addressNo`)
-            VALUE(#{userID},#{price}, #{status},#{orderID},#{addressNo})
+        INSERT INTO `Order`(`userID`,`price`, `status`,`orderID`,`addressNo`,`receive`,`phone`,`remark`)
+            VALUE(#{userID},#{price}, #{status},#{orderID},#{addressNo}, #{receive},#{phone},#{remark})
     </insert>
 
 </mapper>

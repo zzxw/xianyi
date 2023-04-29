@@ -15,7 +15,7 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.util.Base64;
 
 public class Util {
@@ -39,6 +39,17 @@ public class Util {
         return String.valueOf(timeStamp);
     }
 
+    public static String getPlusDayTimeStamp() {
+        LocalDate now = LocalDate.now(); // 获取当前日期
+        LocalTime time = LocalTime.now();
+        LocalDate tomorrow = now.plusDays(1); // 获取当前日期后一天
+
+        LocalDateTime tomorrowTime = tomorrow.atTime(time);
+
+        //System.out.println(tomorrowTime.toInstant(ZoneOffset.ofHours(8)).toEpochMilli());;
+        long timestamp = tomorrowTime.toInstant(ZoneOffset.ofHours(8)).toEpochMilli(); // 获取时间戳
+        return String.valueOf(timestamp);
+    }
     public static String getTimeStamp(String time) {
         if(time == null) {
             return null;

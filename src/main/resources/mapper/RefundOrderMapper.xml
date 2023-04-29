@@ -3,7 +3,7 @@
 <mapper namespace="com.tencent.wxcloudrun.dao.RefundOrderMapper">
     <resultMap id="RefundOrderMapper" type="com.tencent.wxcloudrun.model.RefundOrder">
         <id property="id" column="id"/>
-        <result property="orderId" column="orderId"/>
+        <result property="orderID" column="orderId"/>
         <result property="transactionId" column="transactionId"/>
         <result property="totalFee" column="totalFee"/>
         <result property="refundFee" column="refundFee"/>
@@ -14,8 +14,8 @@
         <result property="failReason" column="failReason"/>
     </resultMap>
     <insert id="createRefundOrder">
-        INSERT INTO `RefundOrder`(`id`,`orderId`,`transactionId`, `totalFee`,`refundFee`,`reason`,`createTime`,`userId`,`status`,`failReason`)
-            VALUE(#{id},#{orderId}, #{transactionId},#{totalFee},#{refundFee},#{reason},#{createTime},#{userId},#{status},#{failReason})
+        INSERT INTO `RefundOrder`(`id`,`orderID`,`transactionId`, `totalFee`,`refundFee`,`reason`,`createTime`,`userId`,`status`,`failReason`)
+            VALUE(#{id},#{orderID}, #{transactionId},#{totalFee},#{refundFee},#{reason},#{createTime},#{userId},#{status},#{failReason})
     </insert>
     <update id="updateRefundOrderStatus"></update>
     <update id="updateRefundOrder">
