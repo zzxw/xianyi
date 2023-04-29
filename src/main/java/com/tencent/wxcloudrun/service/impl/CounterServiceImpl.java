@@ -7,7 +7,6 @@ import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.sun.org.apache.xpath.internal.operations.Or;
 import com.tencent.wxcloudrun.dao.*;
 import com.tencent.wxcloudrun.model.*;
 import com.tencent.wxcloudrun.service.CounterService;
@@ -64,6 +63,8 @@ public class CounterServiceImpl implements CounterService {
   final PromotionDetailMapper promotionDetailMapper;
   final RefundResultMapper refundResultMapper;
   final RefundOrderMapper refundOrderMapper;
+  final PosterMapper posterMapper;
+  final CategoryMapper categoryMapper;
 
   String wayBillToken = "";
 
@@ -97,7 +98,7 @@ public class CounterServiceImpl implements CounterService {
           "vsOva8jS9gHW50EwoZ04Fww=";
 //  private static final String merchantId ="4884D435779D77A97A92A12D8A0B4D1E6B3EFAD0";
 
-  public CounterServiceImpl(@Autowired CountersMapper countersMapper, UserMapper userMapper, CartMapper cartMapper, OrderMapper orderMapper, AddressMapper addressMapper, OrderDetailMapper orderDetailMapper, GoodsMapper goodsMapper, PayMapper payMapper, FeedbackMapper feedbackMapper, PromotionMapper promotionMapper, PromotionDetailMapper promotionDetailMapper, RefundResultMapper refundResultMapper, RefundOrderMapper refundOrderMapper) {
+  public CounterServiceImpl(@Autowired CountersMapper countersMapper, UserMapper userMapper, CartMapper cartMapper, OrderMapper orderMapper, AddressMapper addressMapper, OrderDetailMapper orderDetailMapper, GoodsMapper goodsMapper, PayMapper payMapper, FeedbackMapper feedbackMapper, PromotionMapper promotionMapper, PromotionDetailMapper promotionDetailMapper, RefundResultMapper refundResultMapper, RefundOrderMapper refundOrderMapper, PosterMapper posterMapper, CategoryMapper categoryMapper) {
     this.countersMapper = countersMapper;
     this.userMapper = userMapper;
     this.cartMapper = cartMapper;
@@ -111,6 +112,8 @@ public class CounterServiceImpl implements CounterService {
     this.promotionDetailMapper = promotionDetailMapper;
     this.refundResultMapper = refundResultMapper;
     this.refundOrderMapper = refundOrderMapper;
+    this.posterMapper = posterMapper;
+    this.categoryMapper = categoryMapper;
   }
 
   @Override
@@ -1074,6 +1077,21 @@ public class CounterServiceImpl implements CounterService {
     map.put("timeStamp",timeStamp);
 
     return map;
+  }
+
+  @Override
+  public List<Poster> getPoster() {
+    return posterMapper.getPosters();
+  }
+
+  @Override
+  public List<PmsProductCategory> getCategory() {
+    return categoryMapper.getCategory();
+  }
+
+  @Override
+  public List<Map<String, String>> getCategoryInfo() {
+    return categoryMapper.getCategoryInfo();
   }
 
   public WechatPayHttpClientBuilder getBuild() {

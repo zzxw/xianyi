@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.tencent.wxcloudrun.dao.PosterMapper">
+
+    <resultMap id="PosterMapper" type="com.tencent.wxcloudrun.model.Poster">
+        <id property="id" column="id"/>
+        <result property="type" column="type"/>
+        <result property="img" column="img"/>
+        <result property="href" column="href"/>
+        <result property="no" column="no"/>
+    </resultMap>
+    <insert id="createPoster">
+        INSERT INTO `Poster`(`type`,`img`,`href`,`no`)
+            VALUE(#{type},#{img},#{href},#{no})
+    </insert>
+    <update id="updatePoster">
+        UPDATE `Poster` SET type = #{type}
+        <if test="img != null and img!=''">
+            ,img = #{img}
+        </if>
+        <if test="href != null and href!=''">
+            ,href = #{href}
+        </if>
+        <if test="no != null">
+            ,no = #{no}
+        </if>
+        where id = #{id}
+    </update>
+    <delete id="deletePoster">
+        DELETE
+        FROM Poster
+        where id = #{id}
+    </delete>
+    <delete id="deletePosters">
+        DELETE
+        FROM Poster
+        where id in
+        <foreach collection="ids" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+    <select id="queryPoster" resultType="com.tencent.wxcloudrun.model.Poster">
+        SELECT `id`,`type`,`img`,`href`,`no`
+        FROM Poster
+        WHERE type = #{type}
+    </select>
+    <select id="getPoster" resultType="com.tencent.wxcloudrun.model.Poster">
+        SELECT `id`,`type`,`img`,`href`,`no`
+        FROM Poster
+        WHERE id = #{id}
+    </select>
+    <select id="getPosters" resultType="com.tencent.wxcloudrun.model.Poster">
+        SELECT `id`,`type`,`img`,`href`,`no`
+        FROM Poster
+    </select>
+
+
+</mapper>

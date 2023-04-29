@@ -121,4 +121,10 @@ public interface CounterService {
   void insertResult(PayResult payResult);
 
   Map<String, String> getPayment(Order order);
+
+  List<Poster> getPoster();
+
+  List<PmsProductCategory> getCategory();
+
+  List<Map<String,String>> getCategoryInfo();
 }

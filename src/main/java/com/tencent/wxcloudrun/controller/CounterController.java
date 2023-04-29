@@ -803,4 +803,25 @@ public class CounterController {
 
     return ApiResponse.ok(0);
   }
+
+  @GetMapping(value = "/getPoster")
+  ApiResponse getPoster() {
+    logger.info("/getPoster get request");
+    List<Poster> list = counterService.getPoster();
+    return ApiResponse.ok(list);
+  }
+
+  @GetMapping(value = "/getCategory")
+  ApiResponse getCategory() {
+    logger.info("/getCategory get request");
+    List<PmsProductCategory> list = counterService.getCategory();
+    return ApiResponse.ok(list);
+  }
+
+  @GetMapping(value = "/getCategoryInfo")
+  ApiResponse getCategoryInfo() {
+    logger.info("/getCategoryInfo get request");
+    List<Map<String,String>> list = counterService.getCategoryInfo();
+    return ApiResponse.ok(list);
+  }
 }
