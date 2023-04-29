@@ -824,4 +824,15 @@ public class CounterController {
     List<Map<String,String>> list = counterService.getCategoryInfo();
     return ApiResponse.ok(list);
   }
+
+  @GetMapping(value = "/getHomeInfo")
+  ApiResponse getHomeInfo() {
+    logger.info("/getHomeInfo get request");
+    List<Map<String,String>> clist = counterService.getCategoryInfo();
+    List<Poster> list = counterService.getPoster();
+    Map<String, Object> map = new HashMap<>();
+    map.put("category",clist);
+    map.put("poster",list);
+    return ApiResponse.ok(map);
+  }
 }
