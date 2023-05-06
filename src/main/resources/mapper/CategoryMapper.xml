@@ -21,11 +21,11 @@
 
     <select id="getCategory" resultType="com.tencent.wxcloudrun.model.PmsProductCategory">
         SELECT `id`, `name`
-        FROM pms_product_category
+        FROM pms_product_category ORDER BY sort DESC
     </select>
     <select id="getCategoryInfo" resultType="java.util.Map">
         SELECT `id` as 'key', `name` as 'text'
-        FROM pms_product_category
+        FROM pms_product_category ORDER BY sort DESC
     </select>
 
 

@@ -473,6 +473,8 @@ public class CounterServiceImpl implements CounterService {
       buttonInfo.add(pagButton);
     }else if(status == 10) {
       buttonInfo.add(cancelButton);
+    }else if(status == 40){
+      buttonInfo.add((confirmButton));
     }
     return buttonInfo;
   }
@@ -520,6 +522,7 @@ public class CounterServiceImpl implements CounterService {
     map.put("uid","8888888");
     map.put("parentOrderNo",order.getOrderID());
     map.put("orderNo",order.getOrderID());
+    //map.put("remark",order.getRemark());
     map.put("orderType",0);
     map.put("orderSubType",0);
     map.put("orderStatus", orderStatus);
@@ -534,7 +537,7 @@ public class CounterServiceImpl implements CounterService {
     map.put("channelType", 0);
     map.put("channelSource","");
     map.put("channelIdentity", "");
-    map.put("remark", "");
+    map.put("remark", order.getRemark());
 
     map.put("cancelType",null);
     map.put("cancelReasonType",null);
